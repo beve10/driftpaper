@@ -33,6 +33,10 @@
   .note b { color:#c7d2fe; }
   .err { color:#fda4af; font-size:.9rem; min-height:1.3em; margin:.6rem 0 0; }
   a.dl { display:inline-block; margin:.5rem 0; color:#86efac; font-weight:600; }
+  a.btn-install { display:block; margin:.8rem 0; padding:1rem 1.2rem; background:var(--ok);
+                  color:#08210f; border-radius:9px; font-weight:700; text-align:center;
+                  text-decoration:none; font-size:1rem; }
+  a.btn-install:hover { filter:brightness(1.1); }
   .foot { margin-top:1.6rem; color:#8888aa; font-size:.8rem; }
 </style>
 </head>
@@ -60,10 +64,19 @@
   <div class="note" id="note">
     <b>Sent to Driftpaper.</b> Two things can appear:<br>
     1. Your browser asks to open <b>Driftpaper</b> → click <b>Open</b> (tick “always allow” for one-click next time).<br>
-    2. Driftpaper asks to allow this video site the first time → click <b>Yes</b>.<br><br>
-    <b>Nothing happened?</b> You need the Driftpaper app first — one-time setup, no admin rights needed:<br>
-    <a class="dl" href="https://github.com/beve10/driftpaper/releases/download/v0.1.0/DriftpaperSetup.exe">⬇ Download Driftpaper for Windows (beta)</a><br>
-    <span style="font-size:.8rem">Beta note: Windows SmartScreen may warn about an unknown publisher — choose "More info → Run anyway". Code signing lands before public release.</span>
+    2. Driftpaper asks to allow this video site the first time → click <b>Yes</b>.
+  </div>
+
+  <div class="note" id="install">
+    <b>Driftpaper didn't open — you probably don't have it yet.</b><br>
+    (If a small browser dialog did appear near the address bar, click <b>Open</b> there instead.)<br>
+    <a class="btn-install" href="https://github.com/beve10/driftpaper/releases/download/v0.1.0/DriftpaperSetup.exe">
+      ⬇ Install Driftpaper — one-time setup, no admin needed (≈100 MB)
+    </a>
+    <span style="font-size:.8rem">
+      Windows SmartScreen may warn about an unknown publisher (unsigned beta) — choose “More info → Run anyway”.
+      After installing, come back here — <b>your link is saved</b> — and click “Set as wallpaper” again.
+    </span>
   </div>
 
   <p class="foot">Driftpaper runs on your PC — videos are fetched by your machine, never through our servers.
@@ -75,15 +88,43 @@
 const link = document.getElementById('link');
 const err = document.getElementById('err');
 const note = document.getElementById('note');
+const installPanel = document.getElementById('install');
+// ?noapp=1 = preview the not-installed experience without firing the protocol
+const dryRun = new URLSearchParams(location.search).has('noapp');
 
 function fire(raw) {
   err.textContent = '';
+  note.style.display = 'none';
+  installPanel.style.display = 'none';
   const v = (raw || '').trim();
   if (!v) { err.textContent = 'Paste a video link first.'; return; }
   if (!/^https:\/\//i.test(v)) { err.textContent = 'Links must start with https://'; return; }
-  location.href = 'driftpaper://set?url=' + encodeURIComponent(v);
-  note.style.display = 'block';
+  localStorage.setItem('driftpaper-link', v);
+
+  // Detection: if Driftpaper launches, this page loses focus within ~2s.
+  // No focus loss = the protocol went nowhere = the app isn't installed.
+  let left = false;
+  const onLeave = () => { left = true; };
+  window.addEventListener('blur', onLeave);
+  document.addEventListener('visibilitychange', onLeave);
+
+  if (!dryRun) location.href = 'driftpaper://set?url=' + encodeURIComponent(v);
+
+  setTimeout(() => {
+    window.removeEventListener('blur', onLeave);
+    document.removeEventListener('visibilitychange', onLeave);
+    if (left) {
+      note.style.display = 'block';
+    } else {
+      installPanel.style.display = 'block';
+      installPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  }, 2200);
 }
+
+// A first-timer's pasted link survives the install round-trip.
+const saved = localStorage.getItem('driftpaper-link');
+if (saved && !link.value) link.value = saved;
 
 document.getElementById('go').addEventListener('click', () => fire(link.value));
 link.addEventListener('keydown', e => { if (e.key === 'Enter') fire(link.value); });
