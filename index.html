@@ -3,87 +3,413 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Driftpaper — any video, your live wallpaper</title>
+<title>Driftpaper — turn any video into a live Windows wallpaper</title>
+<meta name="description" content="Paste a link from YouTube or any video site and Driftpaper plays it as your animated Windows wallpaper — behind your icons, game-aware, battery-friendly. Free beta.">
+<meta property="og:title" content="Driftpaper — your desktop, alive">
+<meta property="og:description" content="Any video link becomes your animated Windows wallpaper. Runs 100% on your PC.">
+<meta property="og:image" content="https://beve10.github.io/driftpaper/icon.png">
+<link rel="icon" type="image/png" href="icon.png">
 <style>
-  :root { --bg:#14142a; --card:#1f1f3a; --accent:#6366f1; --accent2:#818cf8; --ok:#22c55e; }
-  * { box-sizing: border-box; }
-  body { font-family:"Segoe UI",sans-serif; background:
-         radial-gradient(1200px 600px at 70% -10%, #2a2a55 0%, var(--bg) 60%);
-         color:#eee; display:grid; place-items:center; min-height:100vh; margin:0; }
-  .card { background:var(--card); padding:2.6rem 3rem; border-radius:14px;
-          width:min(36rem,92vw); box-shadow:0 20px 60px rgba(0,0,0,.4); }
-  .logo { display:flex; align-items:center; gap:.7rem; margin-bottom:.3rem; }
-  .logo-mark { width:38px; height:38px; border-radius:9px; flex:none;
-               background:linear-gradient(180deg,#818cf8,#4f46e5);
-               display:grid; place-items:center; }
-  .logo-mark svg { width:20px; height:20px; }
-  h1 { font-size:1.5rem; margin:0; }
-  .tag { color:#a5a5c8; margin:0 0 1.6rem; }
-  .row { display:flex; gap:.6rem; }
-  input[type=url] { flex:1; padding:.9rem 1rem; border-radius:9px; border:1px solid #3d3d63;
-          background:#15152c; color:#eee; font-size:.95rem; outline:none; }
-  input[type=url]:focus { border-color:var(--accent2); }
-  button { padding:.9rem 1.4rem; border-radius:9px; border:none; background:var(--accent);
-           color:#fff; font-weight:700; font-size:.95rem; cursor:pointer; }
-  button:hover { background:var(--accent2); }
-  .demos { margin-top:.9rem; display:flex; gap:.5rem; flex-wrap:wrap; }
-  .demos a { color:#a5b4fc; font-size:.85rem; cursor:pointer; text-decoration:underline; }
-  .note { display:none; margin-top:1.4rem; padding:1rem 1.2rem; border-radius:9px;
-          background:#15152c; font-size:.9rem; line-height:1.5; }
-  .note b { color:#c7d2fe; }
-  .err { color:#fda4af; font-size:.9rem; min-height:1.3em; margin:.6rem 0 0; }
-  a.dl { display:inline-block; margin:.5rem 0; color:#86efac; font-weight:600; }
-  a.btn-install { display:block; margin:.8rem 0; padding:1rem 1.2rem; background:var(--ok);
-                  color:#08210f; border-radius:9px; font-weight:700; text-align:center;
-                  text-decoration:none; font-size:1rem; }
-  a.btn-install:hover { filter:brightness(1.1); }
-  .foot { margin-top:1.6rem; color:#8888aa; font-size:.8rem; }
+  :root {
+    --bg: #0d0d1c;
+    --bg2: #12122a;
+    --card: #191932;
+    --card2: #1f1f3d;
+    --line: #2c2c52;
+    --txt: #e8e8f2;
+    --mut: #9a9ac0;
+    --dim: #6c6c96;
+    --acc: #6366f1;
+    --acc2: #818cf8;
+    --ok: #34d399;
+    --warn: #fbbf24;
+    --err: #fb7185;
+    --r: 14px;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    background:
+      radial-gradient(1100px 500px at 85% -5%, #23234d 0%, transparent 60%),
+      radial-gradient(900px 500px at -10% 30%, #1a1a3d 0%, transparent 55%),
+      var(--bg);
+    color: var(--txt);
+    line-height: 1.6;
+  }
+  ::selection { background: var(--acc); color: #fff; }
+  a { color: var(--acc2); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .wrap { max-width: 1060px; margin: 0 auto; padding: 0 1.4rem; }
+
+  /* ---------- nav ---------- */
+  nav {
+    position: sticky; top: 0; z-index: 50;
+    backdrop-filter: blur(14px);
+    background: rgba(13,13,28,.72);
+    border-bottom: 1px solid var(--line);
+  }
+  .nav-in { display: flex; align-items: center; gap: 1.6rem; padding: .8rem 1.4rem; max-width: 1060px; margin: 0 auto; }
+  .brand { display: flex; align-items: center; gap: .55rem; font-weight: 700; font-size: 1.08rem; color: var(--txt); }
+  .brand:hover { text-decoration: none; }
+  .brand img { width: 26px; height: 26px; border-radius: 6px; }
+  .nav-links { display: flex; gap: 1.3rem; margin-left: auto; font-size: .92rem; }
+  .nav-links a { color: var(--mut); }
+  .nav-links a:hover { color: var(--txt); text-decoration: none; }
+  .nav-cta {
+    background: var(--acc); color: #fff !important; padding: .45rem 1rem;
+    border-radius: 9px; font-weight: 600;
+  }
+  .nav-cta:hover { background: var(--acc2); text-decoration: none; }
+  @media (max-width: 720px) { .nav-links a:not(.nav-cta) { display: none; } }
+
+  /* ---------- hero ---------- */
+  .hero { display: grid; grid-template-columns: 1.05fr .95fr; gap: 3rem; align-items: center; padding: 4.2rem 0 3.4rem; }
+  @media (max-width: 880px) { .hero { grid-template-columns: 1fr; padding-top: 2.6rem; } }
+  .badge {
+    display: inline-flex; align-items: center; gap: .45rem;
+    font-size: .78rem; font-weight: 600; letter-spacing: .04em;
+    color: var(--acc2); background: rgba(99,102,241,.12);
+    border: 1px solid rgba(99,102,241,.35);
+    padding: .3rem .75rem; border-radius: 999px; margin-bottom: 1.1rem;
+  }
+  .badge .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--ok); animation: pulse 2s infinite; }
+  @keyframes pulse { 50% { opacity: .35; } }
+  h1 { font-size: clamp(2.1rem, 4.6vw, 3.2rem); line-height: 1.12; letter-spacing: -.02em; }
+  h1 em { font-style: normal; background: linear-gradient(90deg, var(--acc2), #c4b5fd); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .sub { color: var(--mut); font-size: 1.08rem; margin: 1rem 0 1.6rem; max-width: 34rem; }
+
+  .paste { display: flex; gap: .6rem; }
+  .paste input {
+    flex: 1; min-width: 0; padding: .95rem 1.1rem; font-size: .95rem;
+    background: var(--card); color: var(--txt);
+    border: 1px solid var(--line); border-radius: 11px; outline: none;
+    transition: border-color .15s, box-shadow .15s;
+  }
+  .paste input:focus { border-color: var(--acc); box-shadow: 0 0 0 3px rgba(99,102,241,.22); }
+  .paste button {
+    padding: .95rem 1.35rem; font-size: .95rem; font-weight: 700;
+    background: linear-gradient(180deg, var(--acc2), var(--acc));
+    color: #fff; border: 0; border-radius: 11px; cursor: pointer;
+    box-shadow: 0 6px 18px rgba(99,102,241,.35);
+    transition: transform .12s, box-shadow .12s;
+    white-space: nowrap;
+  }
+  .paste button:hover { transform: translateY(-1px); box-shadow: 0 9px 22px rgba(99,102,241,.45); }
+  .paste button:active { transform: translateY(0); }
+  .err { color: var(--err); font-size: .88rem; min-height: 1.35em; margin-top: .55rem; }
+  .demos { display: flex; align-items: center; flex-wrap: wrap; gap: .5rem; margin-top: .35rem; font-size: .86rem; color: var(--dim); }
+  .demos a {
+    color: var(--mut); background: var(--card); border: 1px solid var(--line);
+    padding: .3rem .8rem; border-radius: 999px; cursor: pointer;
+  }
+  .demos a:hover { border-color: var(--acc); color: var(--txt); text-decoration: none; }
+  .chips { display: flex; flex-wrap: wrap; gap: .9rem 1.4rem; margin-top: 1.7rem; font-size: .84rem; color: var(--mut); }
+  .chips span { display: inline-flex; align-items: center; gap: .4rem; }
+  .chips b { color: var(--ok); font-weight: 400; }
+
+  /* ---------- hero mockup ---------- */
+  .visual { position: relative; }
+  .monitor {
+    position: relative; aspect-ratio: 16/9.6; border-radius: 16px; overflow: hidden;
+    border: 1px solid var(--line);
+    box-shadow: 0 30px 80px rgba(0,0,0,.55), 0 0 0 1px rgba(129,140,248,.08), 0 0 90px rgba(99,102,241,.14);
+    background: #0a0a18;
+  }
+  .wall { position: absolute; inset: 0; overflow: hidden; }
+  .blob { position: absolute; border-radius: 50%; filter: blur(46px); opacity: .8; }
+  .b1 { width: 65%; height: 85%; left: -12%; top: -18%; background: #4f46e5; animation: drift1 13s ease-in-out infinite alternate; }
+  .b2 { width: 60%; height: 80%; right: -14%; bottom: -22%; background: #7c3aed; animation: drift2 16s ease-in-out infinite alternate; }
+  .b3 { width: 42%; height: 55%; left: 30%; top: 26%; background: #2563eb; opacity: .55; animation: drift3 11s ease-in-out infinite alternate; }
+  @keyframes drift1 { to { transform: translate(16%, 12%) scale(1.15); } }
+  @keyframes drift2 { to { transform: translate(-14%, -10%) scale(1.1); } }
+  @keyframes drift3 { to { transform: translate(-10%, 14%) scale(1.22); } }
+  .icons { position: absolute; left: 4.5%; top: 7%; display: grid; gap: 12%; }
+  .icon { width: 30px; }
+  .icon .sq {
+    width: 30px; height: 30px; border-radius: 8px;
+    background: rgba(255,255,255,.16); border: 1px solid rgba(255,255,255,.22);
+    backdrop-filter: blur(3px);
+  }
+  .icon .lb { height: 5px; width: 26px; margin: 5px auto 0; border-radius: 3px; background: rgba(255,255,255,.3); }
+  .taskbar {
+    position: absolute; left: 0; right: 0; bottom: 0; height: 9.5%;
+    background: rgba(10,10,24,.66); backdrop-filter: blur(8px);
+    border-top: 1px solid rgba(255,255,255,.08);
+    display: flex; align-items: center; justify-content: center; gap: 9px;
+  }
+  .tb { width: 17px; height: 17px; border-radius: 5px; background: rgba(255,255,255,.2); }
+  .tb.active { background: var(--acc2); box-shadow: 0 0 8px rgba(129,140,248,.8); }
+  .caption { text-align: center; color: var(--dim); font-size: .8rem; margin-top: .8rem; }
+
+  /* ---------- status panels ---------- */
+  .panel {
+    display: none; margin-top: 1.2rem; padding: 1.05rem 1.25rem;
+    background: var(--card); border: 1px solid var(--line); border-radius: var(--r);
+    font-size: .92rem;
+  }
+  .panel.show { display: block; animation: rise .3s ease; }
+  @keyframes rise { from { opacity: 0; transform: translateY(6px); } }
+  .panel.ok { border-color: rgba(52,211,153,.4); }
+  .panel.get { border-color: rgba(129,140,248,.5); }
+  .btn-install {
+    display: block; margin: .85rem 0; padding: .95rem 1.2rem; text-align: center;
+    background: linear-gradient(180deg, #3ddfa5, var(--ok)); color: #052e1e;
+    border-radius: 11px; font-weight: 700; font-size: .98rem;
+  }
+  .btn-install:hover { filter: brightness(1.06); text-decoration: none; }
+  .small { font-size: .8rem; color: var(--mut); }
+
+  /* ---------- sections ---------- */
+  section { padding: 3.6rem 0; }
+  .sec-head { text-align: center; margin-bottom: 2.4rem; }
+  .sec-head h2 { font-size: 1.9rem; letter-spacing: -.01em; }
+  .sec-head p { color: var(--mut); margin-top: .4rem; }
+  .kicker { color: var(--acc2); font-size: .8rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+
+  .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.1rem; }
+  @media (max-width: 820px) { .steps { grid-template-columns: 1fr; } }
+  .step {
+    background: var(--card); border: 1px solid var(--line); border-radius: var(--r);
+    padding: 1.6rem 1.5rem; position: relative;
+  }
+  .step .num {
+    width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center;
+    background: rgba(99,102,241,.16); color: var(--acc2); font-weight: 800; margin-bottom: .9rem;
+    border: 1px solid rgba(99,102,241,.35);
+  }
+  .step h3 { font-size: 1.06rem; margin-bottom: .45rem; }
+  .step p { color: var(--mut); font-size: .9rem; }
+  .step .hint { margin-top: .7rem; padding: .6rem .8rem; border-left: 3px solid var(--acc); background: rgba(99,102,241,.08); border-radius: 0 8px 8px 0; font-size: .82rem; color: var(--mut); }
+
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.1rem; }
+  @media (max-width: 820px) { .grid { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 560px) { .grid { grid-template-columns: 1fr; } }
+  .feat {
+    background: var(--card); border: 1px solid var(--line); border-radius: var(--r);
+    padding: 1.4rem 1.4rem; transition: transform .18s, border-color .18s;
+  }
+  .feat:hover { transform: translateY(-3px); border-color: rgba(129,140,248,.45); }
+  .feat .ico { font-size: 1.5rem; margin-bottom: .6rem; }
+  .feat h3 { font-size: .98rem; margin-bottom: .35rem; }
+  .feat p { color: var(--mut); font-size: .86rem; }
+
+  .faq { max-width: 760px; margin: 0 auto; }
+  details {
+    background: var(--card); border: 1px solid var(--line); border-radius: 12px;
+    margin-bottom: .7rem; overflow: hidden;
+  }
+  summary {
+    cursor: pointer; list-style: none; padding: 1rem 1.25rem; font-weight: 600; font-size: .95rem;
+    display: flex; justify-content: space-between; align-items: center; gap: 1rem;
+  }
+  summary::-webkit-details-marker { display: none; }
+  summary::after { content: "+"; color: var(--acc2); font-size: 1.25rem; font-weight: 400; transition: transform .2s; }
+  details[open] summary::after { transform: rotate(45deg); }
+  details .a { padding: 0 1.25rem 1.1rem; color: var(--mut); font-size: .9rem; }
+  details[open] { border-color: rgba(129,140,248,.4); }
+
+  .dl-box {
+    max-width: 620px; margin: 0 auto; text-align: center;
+    background: linear-gradient(180deg, var(--card2), var(--card));
+    border: 1px solid var(--line); border-radius: 18px; padding: 2.6rem 2rem;
+  }
+  .dl-btn {
+    display: inline-block; padding: 1.05rem 2.2rem; border-radius: 12px;
+    background: linear-gradient(180deg, var(--acc2), var(--acc)); color: #fff;
+    font-weight: 800; font-size: 1.05rem; box-shadow: 0 10px 30px rgba(99,102,241,.4);
+    transition: transform .12s;
+  }
+  .dl-btn:hover { transform: translateY(-2px); text-decoration: none; }
+  .dl-meta { color: var(--dim); font-size: .84rem; margin-top: .9rem; }
+  .os-note { display: none; margin-top: 1rem; color: var(--warn); font-size: .88rem; }
+
+  footer { border-top: 1px solid var(--line); padding: 2.2rem 0 2.6rem; margin-top: 2rem; color: var(--dim); font-size: .85rem; }
+  .foot-in { display: flex; flex-wrap: wrap; gap: 1rem 2rem; justify-content: space-between; align-items: center; }
+
+  /* ---------- reveal on scroll ---------- */
+  .rv { opacity: 0; transform: translateY(16px); transition: opacity .55s ease, transform .55s ease; }
+  .rv.in { opacity: 1; transform: none; }
+  @media (prefers-reduced-motion: reduce) {
+    .rv { opacity: 1; transform: none; transition: none; }
+    .blob, .badge .dot { animation: none !important; }
+    html { scroll-behavior: auto; }
+  }
 </style>
 </head>
 <body>
-<div class="card">
-  <div class="logo">
-    <div class="logo-mark"><svg viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg></div>
-    <h1>Driftpaper</h1>
-  </div>
-  <p class="tag">Paste a video link — it becomes your animated desktop wallpaper.</p>
 
-  <div class="row">
-    <input type="url" id="link" placeholder="https://www.youtube.com/watch?v=…  or a direct video link"
-           spellcheck="false">
-    <button id="go">Set as wallpaper</button>
+<nav>
+  <div class="nav-in">
+    <a class="brand" href="#"><img src="icon.png" alt=""> Driftpaper</a>
+    <div class="nav-links">
+      <a href="#how">How it works</a>
+      <a href="#features">Features</a>
+      <a href="#faq">FAQ</a>
+      <a href="https://github.com/beve10/driftpaper" target="_blank" rel="noopener">GitHub</a>
+      <a class="nav-cta" href="#download">Download</a>
+    </div>
   </div>
-  <p class="err" id="err"></p>
+</nav>
 
-  <div class="demos">
-    Try one:
-    <a data-url="https://test-videos.co.uk/vids/jellyfish/mp4/h264/1080/Jellyfish_1080_10s_5MB.mp4">🎐 jellyfish</a>
-    <a data-url="https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/1080/Big_Buck_Bunny_1080_10s_5MB.mp4">🐰 bunny</a>
+<header class="wrap hero">
+  <div>
+    <span class="badge"><span class="dot"></span> FREE BETA · WINDOWS 10 / 11</span>
+    <h1>Your desktop, <em>alive</em>.</h1>
+    <p class="sub">Paste a link from YouTube or almost any video site — Driftpaper plays it as your
+    animated wallpaper, drifting behind your icons while you work.</p>
+
+    <div class="paste">
+      <input type="url" id="link" placeholder="https://www.youtube.com/watch?v=…" spellcheck="false" aria-label="Video link">
+      <button id="go">Set as wallpaper</button>
+    </div>
+    <p class="err" id="err"></p>
+    <div class="demos">
+      No link handy? Try:
+      <a data-url="https://test-videos.co.uk/vids/jellyfish/mp4/h264/1080/Jellyfish_1080_10s_5MB.mp4">🎐 Jellyfish</a>
+      <a data-url="https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/1080/Big_Buck_Bunny_1080_10s_5MB.mp4">🐰 Big Buck Bunny</a>
+    </div>
+
+    <div class="panel ok" id="note">
+      <b>Sent to Driftpaper ✓</b><br>
+      First time? Two quick confirmations may appear:<br>
+      1 · Your browser asks to open <b>Driftpaper</b> — click <b>Open</b> (tick “always allow” for one-click next time).<br>
+      2 · Driftpaper asks to trust this video site — click <b>Yes</b>.
+    </div>
+
+    <div class="panel get" id="install">
+      <b>Driftpaper isn't installed — your download is starting…</b><br>
+      Run <b>DriftpaperSetup.exe</b> when it finishes. One-time setup, no admin rights, ~100 MB.<br>
+      <a class="btn-install" id="manualdl" href="https://github.com/beve10/driftpaper/releases/download/v0.1.0/DriftpaperSetup.exe">⬇ Download didn't start? Click here</a>
+      <span class="small">Windows SmartScreen may warn during this beta (we're not code-signed yet) — choose
+      “More info → Run anyway”. When you come back, <b>your link is saved</b> — just click Set again.</span>
+    </div>
+
+    <div class="chips">
+      <span><b>✓</b> No account needed</span>
+      <span><b>✓</b> Runs 100% on your PC</span>
+      <span><b>✓</b> No admin rights</span>
+      <span><b>✓</b> Free while in beta</span>
+    </div>
   </div>
 
-  <div class="note" id="note">
-    <b>Sent to Driftpaper.</b> Two things can appear:<br>
-    1. Your browser asks to open <b>Driftpaper</b> → click <b>Open</b> (tick “always allow” for one-click next time).<br>
-    2. Driftpaper asks to allow this video site the first time → click <b>Yes</b>.
+  <div class="visual rv">
+    <div class="monitor" aria-hidden="true">
+      <div class="wall">
+        <div class="blob b1"></div>
+        <div class="blob b2"></div>
+        <div class="blob b3"></div>
+      </div>
+      <div class="icons">
+        <div class="icon"><div class="sq"></div><div class="lb"></div></div>
+        <div class="icon"><div class="sq"></div><div class="lb"></div></div>
+        <div class="icon"><div class="sq"></div><div class="lb"></div></div>
+        <div class="icon"><div class="sq"></div><div class="lb"></div></div>
+      </div>
+      <div class="taskbar">
+        <div class="tb active"></div><div class="tb"></div><div class="tb"></div><div class="tb"></div>
+      </div>
+    </div>
+    <p class="caption">Live preview — your wallpaper drifts behind your icons, exactly like this.</p>
   </div>
+</header>
 
-  <div class="note" id="install">
-    <b>Driftpaper isn't installed — your download is starting automatically.</b><br>
-    Run <b>DriftpaperSetup.exe</b> from your downloads when it finishes (one-time setup, no admin, ≈100 MB).<br>
-    (Have it already? If a small browser dialog appeared near the address bar, click <b>Open</b> there instead.)<br>
-    <a class="btn-install" id="manualdl" href="https://github.com/beve10/driftpaper/releases/download/v0.1.0/DriftpaperSetup.exe">
-      ⬇ Download didn't start? Click here
-    </a>
-    <span style="font-size:.8rem">
-      Windows SmartScreen may warn about an unknown publisher (unsigned beta) — choose “More info → Run anyway”.
-      After installing, come back here — <b>your link is saved</b> — and click “Set as wallpaper” again.
-    </span>
+<section id="how" class="wrap">
+  <div class="sec-head rv">
+    <div class="kicker">How it works</div>
+    <h2>From link to living desktop in one minute</h2>
+    <p>Three steps the first time. One click every time after.</p>
   </div>
+  <div class="steps">
+    <div class="step rv">
+      <div class="num">1</div>
+      <h3>Paste a video link</h3>
+      <p>YouTube, a direct video file, and most video sites work. Short loops (10s–2min) make the best wallpapers.</p>
+      <div class="hint">Your video is fetched by <b>your PC</b>, straight from the source — it never passes through our servers.</div>
+    </div>
+    <div class="step rv">
+      <div class="num">2</div>
+      <h3>Install once — 60 seconds</h3>
+      <p>The first click offers the Driftpaper app. It installs to your user folder: no admin password, no system changes, clean uninstall from Windows Settings.</p>
+      <div class="hint">Your browser will ask <i>“Open Driftpaper?”</i> — that's Windows handing your link to the app. Tick “always allow” and it never asks again.</div>
+    </div>
+    <div class="step rv">
+      <div class="num">3</div>
+      <h3>Your desktop comes alive</h3>
+      <p>The video plays muted, looping, behind your icons. Change it anytime by pasting a new link — one click, instant.</p>
+      <div class="hint">Driftpaper lives in your system tray: pause, scaling options, run-on-startup — all one right-click away.</div>
+    </div>
+  </div>
+</section>
 
-  <p class="foot">Driftpaper runs on your PC — videos are fetched by your machine, never through our servers.
-    · <a style="color:#8888aa" href="https://github.com/beve10/driftpaper/releases/latest">download</a>
-    · beta (driftpaper.app coming soon)</p>
-</div>
+<section id="features" class="wrap">
+  <div class="sec-head rv">
+    <div class="kicker">Features</div>
+    <h2>Considerate by design</h2>
+    <p>A wallpaper app runs all day — so it has to behave.</p>
+  </div>
+  <div class="grid">
+    <div class="feat rv"><div class="ico">🎮</div><h3>Game-aware</h3><p>Auto-pauses the moment a fullscreen game or app takes over — zero FPS stolen while you play.</p></div>
+    <div class="feat rv"><div class="ico">🔋</div><h3>Battery-friendly</h3><p>On a laptop? Playback pauses on battery and resumes when you plug back in. Configurable.</p></div>
+    <div class="feat rv"><div class="ico">🔗</div><h3>Any video link</h3><p>YouTube and most video sites, or any direct video file — powered by the same engine trusted by millions (mpv + yt-dlp).</p></div>
+    <div class="feat rv"><div class="ico">🖼️</div><h3>Fits any screen</h3><p>Fill, fit or stretch — ultrawide, portrait clips and odd ratios handled from the tray menu.</p></div>
+    <div class="feat rv"><div class="ico">🛡️</div><h3>Private by architecture</h3><p>No account, no telemetry, no cloud. Videos download straight to your machine and stay there.</p></div>
+    <div class="feat rv"><div class="ico">🔄</div><h3>Stays fresh</h3><p>Checks for updates on launch and tells you when a new version is ready — one click to get it.</p></div>
+  </div>
+</section>
+
+<section id="faq" class="wrap">
+  <div class="sec-head rv">
+    <div class="kicker">FAQ</div>
+    <h2>Fair questions, straight answers</h2>
+  </div>
+  <div class="faq rv">
+    <details>
+      <summary>Is Driftpaper safe?</summary>
+      <div class="a">Yes — and you don't have to take our word for it: the app installs only to your own user folder (it literally cannot touch system files — it never asks for admin rights), makes no network requests except downloading the videos <i>you</i> ask for and checking for updates, and the site + releases are public on GitHub. Uninstalling removes every trace.</div>
+    </details>
+    <details>
+      <summary>Why does Windows SmartScreen warn me during install?</summary>
+      <div class="a">Because the beta isn't code-signed yet. Signing certificates identify the publisher to Windows and cost real money — that's planned before the public release. Until then SmartScreen shows “unknown publisher” for <i>any</i> unsigned app, ours included. Choose “More info → Run anyway” if you trust us.</div>
+    </details>
+    <details>
+      <summary>Will it slow down my games or my PC?</summary>
+      <div class="a">No. Driftpaper pauses automatically whenever a fullscreen app is in front — games get 100% of your GPU. Decoding uses your graphics card's video engine (the same hardware that plays YouTube), so normal desktop use barely notices it. It also pauses when nothing is visible and, on laptops, when you're on battery.</div>
+    </details>
+    <details>
+      <summary>Where do my videos go? Do you see them?</summary>
+      <div class="a">Videos are downloaded <b>by your PC, directly from the source site</b>, into your local app-data folder — they never pass through any Driftpaper server (we don't have servers). Nothing about your usage is collected or sent anywhere.</div>
+    </details>
+    <details>
+      <summary>Does sound play?</summary>
+      <div class="a">No — wallpapers are always muted. That also lets Driftpaper download a video-only stream, which is faster and lighter.</div>
+    </details>
+    <details>
+      <summary>How do I uninstall?</summary>
+      <div class="a">Windows Settings → Apps → Driftpaper → Uninstall. It stops playback, detaches from your desktop, and removes the app, its cache, and its settings — verified to leave zero traces.</div>
+    </details>
+  </div>
+</section>
+
+<section id="download" class="wrap">
+  <div class="dl-box rv">
+    <div class="kicker">Get Driftpaper</div>
+    <h2 style="margin:.35rem 0 1.4rem">Ready when you are</h2>
+    <a class="dl-btn" href="https://github.com/beve10/driftpaper/releases/download/v0.1.0/DriftpaperSetup.exe">⬇ Download for Windows</a>
+    <div class="dl-meta">v0.1.0 beta · ~100 MB · Windows 10/11 (64-bit) · no admin rights needed<br>
+      <a href="https://github.com/beve10/driftpaper/releases" target="_blank" rel="noopener">Release notes</a></div>
+    <div class="os-note" id="osnote">⚠ You're not on Windows — Driftpaper is a Windows app. Open this page on your PC to install.</div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot-in">
+    <span>© <span id="yr"></span> Driftpaper · beta — driftpaper.app coming soon</span>
+    <span>Runs on your PC. No accounts, no servers, no tracking.</span>
+    <span><a href="https://github.com/beve10/driftpaper" target="_blank" rel="noopener">GitHub</a> ·
+          <a href="https://github.com/beve10/driftpaper/releases" target="_blank" rel="noopener">Releases</a></span>
+  </div>
+</footer>
 
 <script>
 const link = document.getElementById('link');
@@ -95,8 +421,8 @@ const dryRun = new URLSearchParams(location.search).has('noapp');
 
 function fire(raw) {
   err.textContent = '';
-  note.style.display = 'none';
-  installPanel.style.display = 'none';
+  note.classList.remove('show');
+  installPanel.classList.remove('show');
   const v = (raw || '').trim();
   if (!v) { err.textContent = 'Paste a video link first.'; return; }
   if (!/^https:\/\//i.test(v)) { err.textContent = 'Links must start with https://'; return; }
@@ -115,9 +441,9 @@ function fire(raw) {
     window.removeEventListener('blur', onLeave);
     document.removeEventListener('visibilitychange', onLeave);
     if (left) {
-      note.style.display = 'block';
+      note.classList.add('show');
     } else {
-      installPanel.style.display = 'block';
+      installPanel.classList.add('show');
       installPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       // Zoom-style: kick off the installer download automatically. The Set
       // click a moment ago still counts as the user gesture that permits it.
@@ -126,14 +452,26 @@ function fire(raw) {
   }, 2200);
 }
 
-// A first-timer's pasted link survives the install round-trip.
-const saved = localStorage.getItem('driftpaper-link');
-if (saved && !link.value) link.value = saved;
-
 document.getElementById('go').addEventListener('click', () => fire(link.value));
 link.addEventListener('keydown', e => { if (e.key === 'Enter') fire(link.value); });
 document.querySelectorAll('.demos a').forEach(a =>
   a.addEventListener('click', () => { link.value = a.dataset.url; fire(a.dataset.url); }));
+
+// A first-timer's pasted link survives the install round-trip.
+const saved = localStorage.getItem('driftpaper-link');
+if (saved && !link.value) link.value = saved;
+
+// Reveal-on-scroll
+const io = new IntersectionObserver(es => es.forEach(e => {
+  if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+}), { threshold: .12 });
+document.querySelectorAll('.rv').forEach(el => io.observe(el));
+
+// Non-Windows visitors get a heads-up instead of a useless download
+if (!/Windows/i.test(navigator.userAgent))
+  document.getElementById('osnote').style.display = 'block';
+
+document.getElementById('yr').textContent = new Date().getFullYear();
 </script>
 </body>
 </html>
