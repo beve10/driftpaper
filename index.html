@@ -68,10 +68,11 @@
   </div>
 
   <div class="note" id="install">
-    <b>Driftpaper didn't open — you probably don't have it yet.</b><br>
-    (If a small browser dialog did appear near the address bar, click <b>Open</b> there instead.)<br>
-    <a class="btn-install" href="https://github.com/beve10/driftpaper/releases/download/v0.1.0/DriftpaperSetup.exe">
-      ⬇ Install Driftpaper — one-time setup, no admin needed (≈100 MB)
+    <b>Driftpaper isn't installed — your download is starting automatically.</b><br>
+    Run <b>DriftpaperSetup.exe</b> from your downloads when it finishes (one-time setup, no admin, ≈100 MB).<br>
+    (Have it already? If a small browser dialog appeared near the address bar, click <b>Open</b> there instead.)<br>
+    <a class="btn-install" id="manualdl" href="https://github.com/beve10/driftpaper/releases/download/v0.1.0/DriftpaperSetup.exe">
+      ⬇ Download didn't start? Click here
     </a>
     <span style="font-size:.8rem">
       Windows SmartScreen may warn about an unknown publisher (unsigned beta) — choose “More info → Run anyway”.
@@ -118,6 +119,9 @@ function fire(raw) {
     } else {
       installPanel.style.display = 'block';
       installPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      // Zoom-style: kick off the installer download automatically. The Set
+      // click a moment ago still counts as the user gesture that permits it.
+      document.getElementById('manualdl').click();
     }
   }, 2200);
 }
