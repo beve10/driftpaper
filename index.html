@@ -11,432 +11,341 @@
 <link rel="icon" type="image/png" href="icon.png">
 <style>
   :root {
-    --paper: #f3efe5;
-    --paper2: #ebe6d8;
-    --ink: #171610;
-    --ink2: #3d3a2f;
-    --mut: #736d5b;
-    --hair: #cfc8b4;
-    --acc: #cc4514;
-    --grn: #2e6b45;
+    --bone: #eceae4;
+    --bone2: #e3e0d8;
+    --inkc: #23221e;
+    --mut: #8b877c;
+    --amber: #e79a50;
+    --amber2: #f3b573;
+    --sea1: #0c2830;
+    --sea2: #123c47;
+    --glass: rgba(10, 26, 31, .55);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  html { scroll-behavior: smooth; }
+  html, body { height: 100%; }
   body {
-    background: var(--paper);
-    color: var(--ink);
+    background:
+      radial-gradient(1200px 700px at 50% 20%, #f4f2ee 0%, var(--bone) 55%, var(--bone2) 100%);
+    color: var(--inkc);
     font-family: "Segoe UI", system-ui, sans-serif;
-    font-size: 16px;
-    line-height: 1.55;
+    overflow: hidden;
   }
-  ::selection { background: var(--ink); color: var(--paper); }
+  @media (max-height: 560px), (max-width: 620px) { body { overflow: auto; } }
   .mono { font-family: Consolas, "Cascadia Mono", ui-monospace, monospace; }
-  a { color: inherit; }
 
-  /* ------ utility bar ------ */
-  .bar {
-    display: flex; align-items: baseline; gap: 1.5rem;
-    padding: .7rem 2.2rem;
-    border-bottom: 1.5px solid var(--ink);
-    font-family: Consolas, ui-monospace, monospace; font-size: .78rem;
-    position: sticky; top: 0; background: var(--paper); z-index: 40;
+  .studio {
+    min-height: 100%;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 2.2rem 1rem 1.4rem;
   }
-  .bar .wordmark { font-weight: 700; letter-spacing: .14em; font-size: .82rem; text-decoration: none; }
-  .bar .desc { color: var(--mut); }
-  .bar nav { margin-left: auto; display: flex; gap: 1.4rem; }
-  .bar nav a { color: var(--ink2); text-decoration: none; }
-  .bar nav a:hover { color: var(--acc); }
-  .bar nav a.dl { color: var(--acc); font-weight: 700; }
-  @media (max-width: 760px) { .bar { padding: .7rem 1.1rem; } .bar .desc, .bar nav a:not(.dl) { display: none; } }
 
-  /* ------ masthead ------ */
-  .mast { padding: 8.5rem 2.2rem 2rem; position: relative; }
-  @media (max-width: 760px) { .mast { padding: 4.5rem 1.1rem 1.5rem; } }
-  .mast h1 {
-    font-family: Georgia, "Times New Roman", serif;
-    font-weight: 400;
-    font-size: clamp(3.2rem, 9.5vw, 8.2rem);
-    line-height: .96;
-    letter-spacing: -.025em;
-    max-width: 12ch;
+  /* ================= the monitor ================= */
+  .rig { display: flex; flex-direction: column; align-items: center; }
+  .screen {
+    position: relative;
+    width: min(94vw, calc((100vh - 205px) * 1.72), 1240px);
+    aspect-ratio: 16 / 9.4;
+    background: #06161b;
+    border-radius: 10px;
+    border: 2px solid #101010;
+    box-shadow:
+      inset 0 0 0 8px #0b0b0c,
+      0 2px 4px rgba(30,28,20,.25),
+      0 30px 70px -18px rgba(30,28,20,.45);
+    overflow: hidden;
   }
-  .mast h1 .it { font-style: italic; color: var(--acc); }
-  .mast .aside {
+  .neck {
+    width: clamp(54px, 6vw, 84px); height: clamp(46px, 7vh, 78px);
+    background: linear-gradient(90deg, #b9b6ae, #d8d5cd 45%, #a9a69e);
+    box-shadow: inset 0 -8px 12px rgba(0,0,0,.14);
+  }
+  .foot {
+    width: clamp(150px, 17vw, 240px); height: 12px;
+    border-radius: 7px 7px 10px 10px;
+    background: linear-gradient(180deg, #cfccc4, #a5a29a);
+    box-shadow: 0 10px 22px rgba(30,28,20,.30);
+  }
+
+  /* ---- wallpaper: dusk over water, slow & sober ---- */
+  .wall { position: absolute; inset: 8px; border-radius: 4px; overflow: hidden; }
+  .sky {
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg,
+      var(--sea1) 0%, var(--sea2) 38%,
+      #6e5a44 62%, #c98festy 75%, #e79a50 100%);
+    background: linear-gradient(180deg,
+      var(--sea1) 0%, var(--sea2) 38%,
+      #6e5a44 62%, #d8874e 78%, #e79a50 100%);
+  }
+  .sun {
+    position: absolute; left: 50%; top: 66%;
+    width: 42vmin; height: 42vmin; transform: translate(-50%, -50%);
+    background: radial-gradient(circle, rgba(243,181,115,.55) 0%, rgba(243,181,115,.12) 42%, transparent 68%);
+    animation: breathe 16s ease-in-out infinite alternate;
+  }
+  @keyframes breathe { to { transform: translate(-50%, -52%) scale(1.12); opacity: .85; } }
+  .streak {
+    position: absolute; left: -30%; width: 160%; height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(255,224,186,.35), transparent);
+    animation: glide 34s linear infinite;
+  }
+  .s1 { top: 70%; animation-duration: 38s; }
+  .s2 { top: 78%; animation-duration: 52s; animation-delay: -18s; opacity: .6; }
+  .s3 { top: 86%; animation-duration: 44s; animation-delay: -30s; opacity: .4; }
+  @keyframes glide { from { transform: translateX(-12%); } to { transform: translateX(12%); } }
+
+  /* ---- desktop icons (the demos ARE the desktop) ---- */
+  .dicons { position: absolute; left: 2.2%; top: 5%; display: grid; gap: 1.35rem; z-index: 3; }
+  .di {
+    width: 74px; text-align: center; cursor: pointer;
+    color: #eae6da; font-size: .68rem; line-height: 1.25;
+    text-shadow: 0 1px 3px rgba(0,0,0,.55);
+    border: 0; background: none; font-family: inherit;
+  }
+  .di .bx {
+    width: 46px; height: 46px; margin: 0 auto .3rem;
+    border-radius: 9px;
+    background: rgba(255,255,255,.13);
+    border: 1px solid rgba(255,255,255,.28);
+    backdrop-filter: blur(3px);
+    display: grid; place-items: center;
+    font-size: 1.05rem; color: #fff;
+    transition: background .15s, transform .15s;
+  }
+  .di:hover .bx { background: rgba(255,255,255,.26); transform: translateY(-2px); }
+  .di:focus-visible { outline: 2px solid var(--amber2); outline-offset: 3px; }
+
+  /* ---- centered command palette ---- */
+  .hud {
+    position: absolute; inset: 0; z-index: 4;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 0 6%;
+    pointer-events: none;
+  }
+  .hud > * { pointer-events: auto; }
+  .brand {
     font-family: Consolas, ui-monospace, monospace;
-    font-size: .8rem; color: var(--ink2); line-height: 1.7;
-    max-width: 21rem;
-    margin: 2.6rem 0 0 auto;
-    padding-left: 1rem;
-    border-left: 1.5px solid var(--ink);
+    font-size: clamp(.72rem, 1.1vw, .84rem); letter-spacing: .34em; font-weight: 700;
+    color: #f2ead9;
   }
-  .stamp {
-    position: absolute; right: 2.4rem; top: 7.4rem;
-    transform: rotate(6deg);
-    border: 2px solid var(--acc); color: var(--acc);
-    font-family: Consolas, ui-monospace, monospace; font-size: .72rem; font-weight: 700;
-    letter-spacing: .18em; padding: .5rem .8rem; text-align: center;
-    user-select: none;
+  .tag {
+    color: #cfc6b4; font-size: clamp(.8rem, 1.35vw, .98rem);
+    margin: .45rem 0 1.35rem; text-shadow: 0 1px 4px rgba(0,0,0,.4);
   }
-  @media (max-width: 900px) { .stamp { display: none; } }
-
-  .meta-rule {
-    margin: 3.2rem 2.2rem 0; padding-top: .55rem;
-    border-top: 1.5px solid var(--ink);
-    display: flex; flex-wrap: wrap; gap: .4rem 2.4rem;
-    font-family: Consolas, ui-monospace, monospace; font-size: .74rem; color: var(--mut);
+  .palette {
+    display: flex; width: min(620px, 100%);
+    background: var(--glass);
+    border: 1px solid rgba(255,255,255,.22);
+    border-radius: 13px;
+    backdrop-filter: blur(14px);
+    box-shadow: 0 18px 50px rgba(0,0,0,.4);
+    overflow: hidden;
   }
-  @media (max-width: 760px) { .meta-rule { margin: 2.4rem 1.1rem 0; } }
-
-  /* ------ the tool ------ */
-  .tool { padding: 4.5rem 2.2rem 3rem; max-width: 860px; }
-  @media (max-width: 760px) { .tool { padding: 3rem 1.1rem 2.2rem; } }
-  .tool .lbl {
-    font-family: Consolas, ui-monospace, monospace; font-size: .78rem;
-    letter-spacing: .12em; color: var(--acc); font-weight: 700; margin-bottom: 1rem;
-  }
-  .tool .lbl small { color: var(--mut); font-weight: 400; letter-spacing: 0; }
-  .paste { display: flex; }
-  .paste input {
+  .palette input {
     flex: 1; min-width: 0;
-    font: inherit; font-size: 1rem;
-    padding: 1rem 1.1rem;
-    background: #fff;
-    border: 2px solid var(--ink); border-right: 0;
-    color: var(--ink); outline: none;
+    font: inherit; font-size: clamp(.86rem, 1.4vw, .97rem);
+    padding: 1rem 1.15rem;
+    background: transparent; border: 0; outline: none;
+    color: #f4f1e8;
   }
-  .paste input::placeholder { color: #a29a83; }
-  .paste input:focus { box-shadow: inset 0 0 0 1.5px var(--ink); }
-  .paste button {
-    font: inherit; font-weight: 700; font-size: .95rem;
-    padding: 1rem 1.6rem;
-    background: var(--ink); color: var(--paper);
-    border: 2px solid var(--ink); cursor: pointer;
+  .palette input::placeholder { color: #9fb3b3; }
+  .palette button {
+    font: inherit; font-weight: 700; font-size: clamp(.84rem, 1.3vw, .94rem);
+    padding: 0 1.5rem; border: 0; cursor: pointer;
+    background: var(--amber); color: #2b1a08;
+    transition: background .15s;
     white-space: nowrap;
   }
-  .paste button:hover { background: var(--acc); border-color: var(--acc); }
-  @media (max-width: 560px) {
-    .paste { flex-direction: column; }
-    .paste input { border-right: 2px solid var(--ink); }
-  }
-  .err { color: var(--acc); font-size: .88rem; min-height: 1.4em; margin-top: .5rem; }
-  .try { font-size: .88rem; color: var(--mut); margin-top: .2rem; }
-  .try a { color: var(--ink2); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
-  .try a:hover { color: var(--acc); }
-  .facts {
-    margin-top: 1.6rem;
-    font-family: Consolas, ui-monospace, monospace; font-size: .78rem; color: var(--ink2);
-  }
-  .facts b { color: var(--grn); font-weight: 400; }
+  .palette button:hover { background: var(--amber2); }
+  .perr { min-height: 1.2rem; margin-top: .5rem; font-size: .82rem; color: #ffb4a1; text-shadow: 0 1px 3px rgba(0,0,0,.5); }
 
-  .panel {
-    display: none; margin-top: 1.6rem; padding: 1rem 1.2rem;
-    border: 1.5px solid var(--ink); border-left: 6px solid var(--acc);
-    background: #fff; font-size: .92rem;
+  /* ---- the process, told quietly under the bar ---- */
+  .steps {
+    display: flex; gap: clamp(1.2rem, 3.5vw, 3rem);
+    margin-top: clamp(.9rem, 2.4vh, 1.9rem);
+    width: min(620px, 100%);
   }
-  .panel.show { display: block; }
-  .panel .tag { font-family: Consolas, ui-monospace, monospace; font-size: .72rem; letter-spacing: .14em; color: var(--acc); font-weight: 700; }
-  .panel.ok { border-left-color: var(--grn); }
-  .panel.ok .tag { color: var(--grn); }
-  .btn-install {
-    display: inline-block; margin: .8rem 0 .5rem;
-    padding: .85rem 1.5rem; background: var(--acc); color: #fff;
-    font-weight: 700; text-decoration: none; font-size: .95rem;
-  }
-  .btn-install:hover { background: var(--ink); }
-  .small { font-size: .8rem; color: var(--mut); }
-
-  /* ------ fig.1 band ------ */
-  .fig { margin: 2.5rem 0 0; border-top: 1.5px solid var(--ink); border-bottom: 1.5px solid var(--ink); }
-  .fig .canvas {
-    height: 190px; position: relative; overflow: hidden;
-    background: repeating-linear-gradient(-24deg,
-      var(--paper2) 0 14px, #e2dcc9 14px 15px, var(--paper2) 15px 26px, #ded7c1 26px 28px);
-    background-size: 220% 100%;
-    animation: waterline 26s linear infinite;
-  }
-  @keyframes waterline { to { background-position: -600px 0; } }
-  .fig .dicon {
-    position: absolute; width: 44px; text-align: center;
-    font-family: Consolas, ui-monospace, monospace; font-size: .58rem; color: var(--ink2);
-  }
-  .fig .dicon .bx { width: 34px; height: 34px; margin: 0 auto 4px; border: 1.5px solid var(--ink); background: rgba(243,239,229,.55); }
-  .fig .cap {
-    padding: .5rem 2.2rem .6rem;
-    font-family: Consolas, ui-monospace, monospace; font-size: .74rem; color: var(--mut);
-    border-top: 1px solid var(--hair);
-  }
-  .fig .cap b { color: var(--ink); font-weight: 700; }
-
-  /* ------ sections ------ */
-  .sec { display: grid; grid-template-columns: 240px 1fr; gap: 2rem; padding: 4.2rem 2.2rem; max-width: 1150px; }
-  @media (max-width: 860px) { .sec { grid-template-columns: 1fr; gap: 1.2rem; padding: 3rem 1.1rem; } }
-  .sec + .sec { border-top: 1px solid var(--hair); }
-  .sec .side { position: sticky; top: 4.4rem; align-self: start; }
-  .sec .side .no {
-    font-family: Georgia, serif; font-style: italic;
-    font-size: 2.6rem; color: var(--acc); line-height: 1;
-  }
-  .sec .side h2 {
+  .step { flex: 1; opacity: .34; transition: opacity .6s ease; color: #e9e3d4; }
+  .step.on { opacity: 1; }
+  .step .k {
     font-family: Consolas, ui-monospace, monospace;
-    font-size: .8rem; letter-spacing: .18em; font-weight: 700; margin-top: .5rem;
+    font-size: .66rem; letter-spacing: .18em; color: var(--amber2);
   }
-  .sec .side p { font-size: .82rem; color: var(--mut); margin-top: .6rem; max-width: 15rem; }
+  .step h3 { font-size: clamp(.8rem, 1.35vw, .95rem); font-weight: 600; margin: .18rem 0 .1rem; }
+  .step p { font-size: clamp(.66rem, 1.05vw, .78rem); color: #b9b09b; line-height: 1.45; }
+  .step .track { height: 2px; background: rgba(255,255,255,.16); margin-top: .55rem; overflow: hidden; }
+  .step .track i { display: block; height: 100%; width: 0; background: var(--amber); }
+  .step.on .track i { animation: fill var(--stepms) linear forwards; }
+  @keyframes fill { to { width: 100%; } }
 
-  /* procedure */
-  .proc { counter-reset: st; max-width: 620px; }
-  .proc .st { padding: 1.4rem 0; border-top: 1px solid var(--hair); display: grid; grid-template-columns: 3.4rem 1fr; gap: .6rem; }
-  .proc .st:first-child { border-top: 0; padding-top: 0; }
-  .proc .st::before {
-    counter-increment: st; content: counter(st, decimal-leading-zero);
-    font-family: Consolas, ui-monospace, monospace; font-size: 1.5rem; color: var(--acc);
+  /* ---- windows-style toasts ---- */
+  .toast {
+    position: absolute; right: 14px; bottom: 52px; z-index: 6;
+    width: min(340px, 86%);
+    background: rgba(16, 22, 25, .93);
+    border: 1px solid rgba(255,255,255,.14);
+    border-radius: 9px;
+    padding: .85rem .95rem .9rem;
+    color: #ece7da; font-size: .8rem; line-height: 1.5;
+    box-shadow: 0 16px 40px rgba(0,0,0,.5);
+    opacity: 0; transform: translateY(12px); pointer-events: none;
+    transition: opacity .3s ease, transform .3s ease;
   }
-  .proc h3 { font-size: 1.05rem; font-weight: 700; }
-  .proc p { font-size: .92rem; color: var(--ink2); margin-top: .3rem; }
-  .proc .fn { font-size: .8rem; color: var(--mut); margin-top: .55rem; }
-  .proc .fn sup { color: var(--acc); }
+  .toast.show { opacity: 1; transform: none; pointer-events: auto; }
+  .toast .t {
+    display: flex; align-items: center; gap: .5rem;
+    font-weight: 700; font-size: .82rem; margin-bottom: .25rem;
+  }
+  .toast .t img { width: 16px; height: 16px; border-radius: 4px; }
+  .toast .ok-t { color: #9fd8a9; }
+  .toast .get-t { color: var(--amber2); }
+  .toast a.get-btn {
+    display: block; text-align: center; margin: .6rem 0 .35rem;
+    padding: .6rem .9rem; border-radius: 7px;
+    background: var(--amber); color: #2b1a08; font-weight: 700; text-decoration: none;
+  }
+  .toast a.get-btn:hover { background: var(--amber2); }
+  .toast .fine { color: #a49b87; font-size: .7rem; }
 
-  /* spec table */
-  .spec { width: 100%; max-width: 680px; border-collapse: collapse; font-size: .92rem; }
-  .spec tr { border-top: 1px solid var(--hair); }
-  .spec tr:last-child { border-bottom: 1px solid var(--hair); }
-  .spec th {
-    text-align: left; vertical-align: top; padding: .8rem 1.2rem .8rem 0;
-    font-family: Consolas, ui-monospace, monospace; font-weight: 400; font-size: .78rem;
-    color: var(--mut); white-space: nowrap; width: 11.5rem;
+  /* ---- taskbar ---- */
+  .taskbar {
+    position: absolute; left: 8px; right: 8px; bottom: 8px; height: 38px; z-index: 5;
+    border-radius: 0 0 4px 4px;
+    background: rgba(8, 16, 19, .72);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid rgba(255,255,255,.09);
+    display: flex; align-items: center;
+    padding: 0 .9rem;
+    color: #cfc8b8;
   }
-  .spec td { padding: .8rem 0; color: var(--ink2); }
-  .spec td b { color: var(--ink); }
+  .tstart { width: 15px; height: 15px; border-radius: 4px; background: linear-gradient(135deg, var(--amber2), var(--amber)); }
+  .tray {
+    margin-left: auto; display: flex; gap: 1.1rem; align-items: center;
+    font-family: Consolas, ui-monospace, monospace; font-size: .68rem;
+  }
+  .tray .beta { color: var(--amber2); }
 
-  /* questions */
-  .qa { max-width: 640px; }
-  .qa details { border-top: 1px solid var(--hair); }
-  .qa details:last-child { border-bottom: 1px solid var(--hair); }
-  .qa summary {
-    cursor: pointer; list-style: none; padding: 1rem 0;
-    font-family: Georgia, serif; font-style: italic; font-size: 1.12rem;
-    display: flex; justify-content: space-between; gap: 1rem;
+  /* ---- caption under the monitor ---- */
+  .caption {
+    margin-top: 1.15rem; text-align: center;
+    font-family: Consolas, ui-monospace, monospace;
+    font-size: .72rem; color: var(--mut); line-height: 1.9;
   }
-  .qa summary::-webkit-details-marker { display: none; }
-  .qa summary::after { content: "→"; font-style: normal; color: var(--acc); transition: transform .18s; font-family: Consolas, monospace; }
-  .qa details[open] summary::after { transform: rotate(90deg); }
-  .qa .a { padding: 0 0 1.2rem; font-size: .92rem; color: var(--ink2); max-width: 56ch; }
+  .caption a { color: #6d6759; }
+  .caption a:hover { color: var(--inkc); }
+  .caption .dlm { color: #b06a28; font-weight: 700; text-decoration: none; border-bottom: 1px solid #d9b993; }
+  .caption .dlm:hover { color: var(--inkc); border-color: var(--inkc); }
+  .osnote { display: none; color: #b06a28; }
 
-  /* ------ download band ------ */
-  .band { background: var(--ink); color: var(--paper); padding: 4.6rem 2.2rem 4.2rem; }
-  @media (max-width: 760px) { .band { padding: 3.2rem 1.1rem; } }
-  .band .in { max-width: 1150px; display: grid; grid-template-columns: 1fr auto; gap: 2rem; align-items: end; }
-  @media (max-width: 860px) { .band .in { grid-template-columns: 1fr; } }
-  .band h2 {
-    font-family: Georgia, serif; font-weight: 400;
-    font-size: clamp(2.4rem, 6vw, 4.6rem); line-height: 1; letter-spacing: -.02em;
+  @media (max-width: 620px) {
+    .studio { padding: 1rem .6rem; }
+    .screen { width: 100%; aspect-ratio: auto; height: 78vh; border-radius: 8px; }
+    .neck, .foot { display: none; }
+    .dicons { display: none; }
+    .steps { flex-direction: column; gap: .8rem; }
+    .step .track { display: none; }
+    .step { opacity: .85; }
   }
-  .band h2 .it { font-style: italic; color: #e8956f; }
-  .band .meta { font-family: Consolas, ui-monospace, monospace; font-size: .76rem; color: #b7b1a0; margin-top: 1.2rem; line-height: 1.9; }
-  .band .meta a { color: #e8956f; }
-  .dl-btn {
-    display: inline-block; padding: 1.15rem 2.4rem;
-    background: var(--paper); color: var(--ink);
-    font-weight: 700; font-size: 1.02rem; text-decoration: none;
-    border: 2px solid var(--paper);
-  }
-  .dl-btn:hover { background: var(--acc); border-color: var(--acc); color: #fff; }
-  .os-note { display: none; margin-top: 1rem; font-size: .85rem; color: #e8b96f; }
-
-  footer {
-    padding: 1.1rem 2.2rem 1.4rem;
-    font-family: Consolas, ui-monospace, monospace; font-size: .72rem; color: var(--mut);
-    display: flex; flex-wrap: wrap; gap: .5rem 2.2rem;
-  }
-  footer a { color: var(--ink2); }
-
   @media (prefers-reduced-motion: reduce) {
-    .fig .canvas { animation: none; }
-    html { scroll-behavior: auto; }
+    .sun, .streak { animation: none !important; }
+    .step.on .track i { animation: none; width: 100%; }
   }
 </style>
 </head>
 <body>
 
-<div class="bar">
-  <a class="wordmark" href="#">DRIFTPAPER</a>
-  <span class="desc">— desktop software for windows 10/11</span>
-  <nav>
-    <a href="#procedure">procedure</a>
-    <a href="#spec">specifications</a>
-    <a href="#questions">questions</a>
-    <a href="https://github.com/beve10/driftpaper" target="_blank" rel="noopener">github</a>
-    <a class="dl" href="#get">download ↓</a>
-  </nav>
-</div>
+<main class="studio">
+  <div class="rig">
+    <div class="screen">
+      <div class="wall" aria-hidden="true">
+        <div class="sky"></div>
+        <div class="sun"></div>
+        <div class="streak s1"></div>
+        <div class="streak s2"></div>
+        <div class="streak s3"></div>
+      </div>
 
-<header class="mast">
-  <div class="stamp">FREE<br>WHILE IN<br>BETA</div>
-  <h1>Your desktop,<br><span class="it">set in motion.</span></h1>
-  <p class="aside">Paste a link — YouTube or almost any video site.
-  Driftpaper plays it as your wallpaper: muted, looping,
-  behind your icons, while you work. That's the whole idea.</p>
-</header>
+      <div class="dicons">
+        <button class="di" data-url="https://test-videos.co.uk/vids/jellyfish/mp4/h264/1080/Jellyfish_1080_10s_5MB.mp4" title="Set this demo as your wallpaper">
+          <span class="bx">▶</span>jellyfish.mp4
+        </button>
+        <button class="di" data-url="https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/1080/Big_Buck_Bunny_1080_10s_5MB.mp4" title="Set this demo as your wallpaper">
+          <span class="bx">▶</span>bunny.mp4
+        </button>
+      </div>
 
-<div class="meta-rule">
-  <span>DP-01 · rev 0.1.0</span>
-  <span>windows 10 / 11 (64-bit)</span>
-  <span>no account · no admin rights</span>
-  <span>runs entirely on your pc</span>
-</div>
+      <div class="hud">
+        <div class="brand">D R I F T P A P E R</div>
+        <p class="tag">Any video link becomes your live wallpaper — right behind your icons.</p>
+        <div class="palette">
+          <input type="url" id="link" placeholder="Paste a video link — YouTube or any video site…" spellcheck="false" aria-label="Video link">
+          <button id="go">Set as wallpaper</button>
+        </div>
+        <p class="perr" id="err"></p>
 
-<section class="tool" id="try">
-  <div class="lbl">SET A WALLPAPER <small>— works right from this page</small></div>
-  <div class="paste">
-    <input type="url" id="link" placeholder="https://www.youtube.com/watch?v=…" spellcheck="false" aria-label="Video link">
-    <button id="go">Set as wallpaper</button>
-  </div>
-  <p class="err" id="err"></p>
-  <p class="try">no link handy? try
-    <a data-url="https://test-videos.co.uk/vids/jellyfish/mp4/h264/1080/Jellyfish_1080_10s_5MB.mp4">jellyfish</a> ·
-    <a data-url="https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/1080/Big_Buck_Bunny_1080_10s_5MB.mp4">big buck bunny</a></p>
+        <div class="steps" id="steps" style="--stepms: 3400ms">
+          <div class="step on">
+            <div class="k">STEP 1</div>
+            <h3>Paste a link</h3>
+            <p>YouTube or a direct video file. Short loops work best.</p>
+            <div class="track"><i></i></div>
+          </div>
+          <div class="step">
+            <div class="k">STEP 2 · FIRST TIME ONLY</div>
+            <h3>Install in a minute</h3>
+            <p>No admin rights, no account. Your browser asks once — “Open Driftpaper?”</p>
+            <div class="track"><i></i></div>
+          </div>
+          <div class="step">
+            <div class="k">STEP 3</div>
+            <h3>Your desktop comes alive</h3>
+            <p>Muted, looping, behind your icons. Pauses for games &amp; battery.</p>
+            <div class="track"><i></i></div>
+          </div>
+        </div>
+      </div>
 
-  <div class="panel ok" id="note">
-    <span class="tag">SENT ✓</span><br>
-    First time? Two quick confirmations: your browser asks to open <b>Driftpaper</b> — click
-    <i>Open</i> (tick “always allow”). Then Driftpaper asks to trust this video site — click <i>Yes</i>.
-  </div>
+      <div class="toast" id="note">
+        <div class="t ok-t"><img src="icon.png" alt="">Sent to Driftpaper ✓</div>
+        If it's your first time: click <b>Open</b> in the browser dialog, then allow the video site
+        when Driftpaper asks. Next time it's one click.
+      </div>
 
-  <div class="panel" id="install">
-    <span class="tag">SETUP REQUIRED — DOWNLOAD STARTING…</span><br>
-    Driftpaper isn't installed on this machine. Run <b>DriftpaperSetup.exe</b> from your downloads
-    when it finishes — one-time setup, no admin rights, ~100&nbsp;MB.<br>
-    <a class="btn-install" id="manualdl" href="https://github.com/beve10/driftpaper/releases/download/v0.1.0/DriftpaperSetup.exe">download didn't start? click here</a><br>
-    <span class="small">SmartScreen may warn during the beta (we aren't code-signed yet) — “More info → Run anyway”.
-    Your link is saved on this page; when you're back, click <i>Set</i> again.</span>
-  </div>
+      <div class="toast" id="install">
+        <div class="t get-t"><img src="icon.png" alt="">Driftpaper isn't installed — downloading…</div>
+        Run <b>DriftpaperSetup.exe</b> when it finishes. One-time setup · no admin · ~100 MB.
+        <a class="get-btn" id="manualdl" href="https://github.com/beve10/driftpaper/releases/download/v0.1.0/DriftpaperSetup.exe">Download didn't start? Click here</a>
+        <span class="fine">SmartScreen may warn (unsigned beta): “More info → Run anyway”.
+        Your link stays saved here — click Set again afterwards.</span>
+      </div>
 
-  <p class="facts"><b>✓</b> videos are fetched by your machine, straight from the source — never through our servers &nbsp;<b>✓</b> uninstall removes every trace</p>
-</section>
-
-<figure class="fig" aria-hidden="true">
-  <div class="canvas" id="figc">
-    <div class="dicon" style="left:4%; top:18px"><div class="bx"></div>recycle bin</div>
-    <div class="dicon" style="left:4%; top:100px"><div class="bx"></div>this pc</div>
-    <div class="dicon" style="left:12%; top:18px"><div class="bx"></div>steam</div>
-    <div class="dicon" style="right:6%; bottom:18px"><div class="bx"></div>projects</div>
-  </div>
-  <figcaption class="cap"><b>fig. 1</b> — the video drifts <i>behind</i> the icons. muted. looping. yours.</figcaption>
-</figure>
-
-<section class="sec" id="procedure">
-  <div class="side">
-    <div class="no">i.</div>
-    <h2>PROCEDURE</h2>
-    <p>Three steps the first time.<br>One click every time after.</p>
-  </div>
-  <div class="proc">
-    <div class="st">
-      <div>
-        <h3>Paste a video link</h3>
-        <p>YouTube, a direct video file, most video sites. Short loops — ten seconds to two
-        minutes — make the best wallpapers.</p>
+      <div class="taskbar">
+        <div class="tstart" title="Driftpaper"></div>
+        <div class="tray">
+          <span class="beta">v0.1.0 β</span>
+          <span id="clock">--:--</span>
+        </div>
       </div>
     </div>
-    <div class="st">
-      <div>
-        <h3>Install once — about a minute</h3>
-        <p>The first click offers you the app. It installs to your own user folder: no admin
-        password, no system changes, and Windows Settings uninstalls it completely.</p>
-        <p class="fn"><sup>†</sup> Your browser will ask <i>“Open Driftpaper?”</i> — that's Windows
-        handing your link to the app, not a warning. Tick <i>always allow</i> and it never asks again.</p>
-      </div>
-    </div>
-    <div class="st">
-      <div>
-        <h3>Your desktop comes alive</h3>
-        <p>The video plays behind your icons. Change it any time by pasting a new link —
-        Driftpaper waits in the tray with pause, scaling and startup options.</p>
-      </div>
-    </div>
+    <div class="neck"></div>
+    <div class="foot"></div>
   </div>
-</section>
 
-<section class="sec" id="spec">
-  <div class="side">
-    <div class="no">ii.</div>
-    <h2>SPECIFICATIONS</h2>
-    <p>A wallpaper runs all day. It has to behave.</p>
-  </div>
-  <table class="spec">
-    <tr><th>input</th><td>YouTube &amp; most video sites, or any direct video file — resolved by <b>yt-dlp</b>, played by <b>mpv</b>: open-source engines trusted by millions.</td></tr>
-    <tr><th>during games</th><td>Playback <b>pauses automatically</b> when any fullscreen app is in front. Zero frames stolen; your GPU belongs to the game.</td></tr>
-    <tr><th>on battery</th><td>Pauses unplugged, resumes on AC. Both auto-pauses can be toggled from the tray.</td></tr>
-    <tr><th>rendering</th><td>Hardware video decode — the same silicon that plays YouTube. Fill, fit or stretch for ultrawide and portrait clips.</td></tr>
-    <tr><th>privacy</th><td><b>No account. No telemetry. No servers.</b> Videos download from the source straight to your app-data folder and stay there.</td></tr>
-    <tr><th>sound</th><td>Always muted, by design. (That also makes downloads smaller — video stream only.)</td></tr>
-    <tr><th>updates</th><td>Checked at launch; a new version is one click away. Nothing installs behind your back.</td></tr>
-    <tr><th>footprint</th><td>~300&nbsp;MB on disk incl. its own player &amp; runtime — nothing shared touched, nothing left after uninstall.</td></tr>
-  </table>
-</section>
-
-<section class="sec" id="questions">
-  <div class="side">
-    <div class="no">iii.</div>
-    <h2>FAIR QUESTIONS</h2>
-    <p>Asked bluntly, answered straight.</p>
-  </div>
-  <div class="qa">
-    <details>
-      <summary>Is this safe to run?</summary>
-      <div class="a">The app can't touch system files even if it wanted to — it installs to your user
-      folder and never asks for admin rights. Its only network activity: downloading the videos
-      <i>you</i> request, and a version check at launch. The site and every release are public on GitHub.</div>
-    </details>
-    <details>
-      <summary>Why does Windows warn me during install?</summary>
-      <div class="a">Because the beta isn't code-signed yet. Certificates prove a publisher's identity
-      to Windows and cost real money — signing is planned before the public release. Until then,
-      SmartScreen labels <i>every</i> unsigned program “unknown publisher”, ours included.</div>
-    </details>
-    <details>
-      <summary>Will it eat my FPS?</summary>
-      <div class="a">No — that's the point of the fullscreen detector. A game takes the screen,
-      playback stops within two seconds, and your GPU is untouched until you're back on the desktop.</div>
-    </details>
-    <details>
-      <summary>Where do my videos end up?</summary>
-      <div class="a">In your local app-data folder, fetched by your own machine directly from the
-      source site. There is no Driftpaper server to pass through — we couldn't see your videos
-      if we tried.</div>
-    </details>
-    <details>
-      <summary>And if I want it gone?</summary>
-      <div class="a">Windows Settings → Apps → Driftpaper → Uninstall. It stops playback, detaches
-      from the desktop, and removes the app, cache and settings. Verified to leave zero traces.</div>
-    </details>
-  </div>
-</section>
-
-<div class="band" id="get">
-  <div class="in">
-    <div>
-      <h2>Get Driftpaper.<br><span class="it">Keep your desktop moving.</span></h2>
-      <p class="meta">v0.1.0 beta · ~100 MB · windows 10/11 (64-bit) · no admin rights ·
-      <a href="https://github.com/beve10/driftpaper/releases" target="_blank" rel="noopener">release notes</a><br>
-      free while in beta — no card, no account, no catch.</p>
-      <p class="os-note" id="osnote">⚠ you're not on windows — driftpaper is a windows app. open this page on your pc.</p>
-    </div>
-    <a class="dl-btn" href="https://github.com/beve10/driftpaper/releases/download/v0.1.0/DriftpaperSetup.exe">⬇ Download for Windows</a>
-  </div>
-</div>
-
-<footer>
-  <span>© <span id="yr"></span> driftpaper — beta · driftpaper.app coming soon</span>
-  <span>no accounts · no servers · no tracking</span>
-  <span><a href="https://github.com/beve10/driftpaper" target="_blank" rel="noopener">github</a> · <a href="https://github.com/beve10/driftpaper/releases" target="_blank" rel="noopener">releases</a></span>
-</footer>
+  <p class="caption">
+    free while in beta · windows 10/11 (64-bit) · no admin rights · runs entirely on your pc — videos never touch our servers<br>
+    <a class="dlm" href="https://github.com/beve10/driftpaper/releases/download/v0.1.0/DriftpaperSetup.exe">⬇ DriftpaperSetup.exe (~100 MB)</a>
+    &nbsp;·&nbsp; <a href="https://github.com/beve10/driftpaper" target="_blank" rel="noopener">github</a>
+    &nbsp;·&nbsp; <a href="https://github.com/beve10/driftpaper/releases" target="_blank" rel="noopener">releases</a>
+    <span class="osnote" id="osnote"><br>⚠ you're not on windows — driftpaper is a windows app; open this page on your pc.</span>
+  </p>
+</main>
 
 <script>
 const link = document.getElementById('link');
 const err = document.getElementById('err');
 const note = document.getElementById('note');
 const installPanel = document.getElementById('install');
-// ?noapp=1 = preview the not-installed experience without firing the protocol
 const dryRun = new URLSearchParams(location.search).has('noapp');
 
 function fire(raw) {
@@ -462,9 +371,9 @@ function fire(raw) {
     document.removeEventListener('visibilitychange', onLeave);
     if (left) {
       note.classList.add('show');
+      setTimeout(() => note.classList.remove('show'), 9000);
     } else {
       installPanel.classList.add('show');
-      installPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       // Auto-start the installer download; the Set click still counts
       // as the user gesture that permits it.
       document.getElementById('manualdl').click();
@@ -474,18 +383,35 @@ function fire(raw) {
 
 document.getElementById('go').addEventListener('click', () => fire(link.value));
 link.addEventListener('keydown', e => { if (e.key === 'Enter') fire(link.value); });
-document.querySelectorAll('.try a').forEach(a =>
-  a.addEventListener('click', () => { link.value = a.dataset.url; fire(a.dataset.url); }));
+document.querySelectorAll('.di').forEach(b =>
+  b.addEventListener('click', () => { link.value = b.dataset.url; fire(b.dataset.url); }));
 
 // A first-timer's pasted link survives the install round-trip.
 const saved = localStorage.getItem('driftpaper-link');
 if (saved && !link.value) link.value = saved;
 
-// Non-Windows visitors get a heads-up instead of a useless download
-if (!/Windows/i.test(navigator.userAgent))
-  document.getElementById('osnote').style.display = 'block';
+// The quiet explainer: one step lit at a time.
+const steps = [...document.querySelectorAll('.step')];
+let cur = 0;
+setInterval(() => {
+  steps[cur].classList.remove('on');
+  cur = (cur + 1) % steps.length;
+  const s = steps[cur];
+  s.classList.add('on');
+  const bar = s.querySelector('.track i');
+  if (bar) { bar.style.animation = 'none'; void bar.offsetWidth; bar.style.animation = ''; }
+}, 3400);
 
-document.getElementById('yr').textContent = new Date().getFullYear();
+// A real clock in the taskbar — because it's a real desktop.
+function tick() {
+  const d = new Date();
+  document.getElementById('clock').textContent =
+    String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+}
+tick(); setInterval(tick, 15000);
+
+if (!/Windows/i.test(navigator.userAgent))
+  document.getElementById('osnote').style.display = 'inline';
 </script>
 </body>
 </html>
