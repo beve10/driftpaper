@@ -131,9 +131,15 @@
     font-size: clamp(.72rem, 1.1vw, .84rem); letter-spacing: .34em; font-weight: 700;
     color: #f2ead9;
   }
-  .tag {
-    color: #cfc6b4; font-size: clamp(.8rem, 1.35vw, .98rem);
-    margin: .45rem 0 1.35rem; text-shadow: 0 1px 4px rgba(0,0,0,.4);
+  .big {
+    margin: .7rem 0 1.5rem; text-align: center;
+    font-size: clamp(1.45rem, 3.4vw, 2.55rem);
+    line-height: 1.14; font-weight: 700; letter-spacing: -.015em;
+    color: #f4eee0; text-shadow: 0 2px 14px rgba(0,0,0,.45);
+  }
+  .big em {
+    font-style: italic; font-family: Georgia, serif; font-weight: 400;
+    color: var(--amber2);
   }
   .palette {
     display: flex; width: min(620px, 100%);
@@ -162,25 +168,157 @@
   .palette button:hover { background: var(--amber2); }
   .perr { min-height: 1.2rem; margin-top: .5rem; font-size: .82rem; color: #ffb4a1; text-shadow: 0 1px 3px rgba(0,0,0,.5); }
 
-  /* ---- the process, told quietly under the bar ---- */
-  .steps {
-    display: flex; gap: clamp(1.2rem, 3.5vw, 3rem);
-    margin-top: clamp(.9rem, 2.4vh, 1.9rem);
+  /* ---- the process, ACTED OUT under the bar (one 13.5s loop, 3 acts) ---- */
+  .stage {
+    position: relative;
     width: min(620px, 100%);
+    height: clamp(150px, 24vh, 188px);
+    margin-top: clamp(.9rem, 2.4vh, 1.8rem);
+    background: rgba(244, 240, 230, .97);
+    border-radius: 14px;
+    box-shadow: 0 18px 50px rgba(0,0,0,.35);
+    overflow: hidden;
   }
-  .step { flex: 1; opacity: .45; transition: opacity .6s ease; color: #e9e3d4;
-          text-shadow: 0 1px 4px rgba(0,0,0,.45); }
-  .step.on { opacity: 1; }
-  .step .k {
+  .act {
+    position: absolute; inset: 0 0 32px 0;
+    display: grid; place-items: center;
+    opacity: 0;
+    animation: 13.5s linear infinite;
+  }
+  .a1 { animation-name: actv1; }
+  .a2 { animation-name: actv2; }
+  .a3 { animation-name: actv3; }
+  @keyframes actv1 { 0%,29% {opacity:1} 33%,96% {opacity:0} 100% {opacity:1} }
+  @keyframes actv2 { 0%,29% {opacity:0} 33%,62% {opacity:1} 66%,100% {opacity:0} }
+  @keyframes actv3 { 0%,62% {opacity:0} 66%,96% {opacity:1} 100% {opacity:0} }
+
+  /* act 1 — a link chip drops into a mini bar, the cursor clicks Set */
+  .mbar {
+    position: relative; width: min(320px, 82%); height: 46px;
+    background: #e7e1d1; border-radius: 10px;
+    display: flex; align-items: center; justify-content: flex-end;
+    padding: 5px;
+  }
+  .chipwrap { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); }
+  .chip {
+    display: inline-block;
+    background: #fff; color: #35322a; border: 1.5px solid #cfc7b2;
+    font-size: .72rem; font-weight: 600;
+    padding: .3rem .65rem; border-radius: 999px;
+    animation: chipk 13.5s linear infinite;
+  }
+  @keyframes chipk {
+    0% { transform: translate(-70px,-56px) rotate(-9deg); opacity: 0; }
+    3% { opacity: 1; }
+    8% { transform: translate(0,0) rotate(0); }
+    29% { transform: translate(0,0); opacity: 1; }
+    32%, 100% { opacity: 0; }
+  }
+  .mbtn {
+    background: var(--amber); color: #2b1a08;
+    font-size: .74rem; font-weight: 700;
+    padding: .5rem .85rem; border-radius: 8px;
+    animation: btnk 13.5s linear infinite;
+  }
+  @keyframes btnk {
+    0%, 14% { background: #e79a50; transform: scale(1); }
+    15.5% { background: #f6c085; transform: scale(.93); }
+    17%, 100% { background: #e79a50; transform: scale(1); }
+  }
+  .cur {
+    position: absolute; width: 20px; height: 20px; z-index: 2;
+    filter: drop-shadow(0 2px 3px rgba(0,0,0,.35));
+  }
+  .c1 { right: 44px; bottom: 30px; animation: cur1k 13.5s linear infinite; }
+  @keyframes cur1k {
+    0% { transform: translate(78px,52px); opacity: 0; }
+    5% { opacity: 1; }
+    12% { transform: translate(0,0); }
+    15% { transform: translate(0,0) scale(.8); }
+    17% { transform: translate(0,0) scale(1); }
+    29% { opacity: 1; }
+    32%, 100% { opacity: 0; }
+  }
+
+  /* act 2 — the one-time install: tile, progress, check */
+  .scene2 { display: flex; flex-direction: column; align-items: center; gap: .65rem; }
+  .tile {
+    width: 46px; height: 46px; border-radius: 12px;
+    background: linear-gradient(160deg, #2c333b, #171c22);
+    color: var(--amber2); font-size: 1.05rem;
+    display: grid; place-items: center;
+    animation: tilek 13.5s linear infinite;
+  }
+  @keyframes tilek {
+    0%, 33% { opacity: 0; transform: scale(.55); }
+    36% { opacity: 1; transform: scale(1.07); }
+    38% { transform: scale(1); }
+    62% { opacity: 1; }
+    65%, 100% { opacity: 0; }
+  }
+  .prow { display: flex; align-items: center; gap: .55rem; animation: tilek 13.5s linear infinite; }
+  .prog { width: 168px; height: 7px; border-radius: 5px; background: #ded7c2; overflow: hidden; }
+  .prog i { display: block; height: 100%; width: 0; border-radius: 5px; background: var(--amber); animation: progk 13.5s linear infinite; }
+  @keyframes progk { 0%, 39% { width: 0; } 54%, 100% { width: 100%; } }
+  .chk {
+    width: 20px; height: 20px; border-radius: 50%;
+    background: #3f9d63; color: #fff; font-size: .68rem; font-weight: 700;
+    display: grid; place-items: center;
+    animation: chkk 13.5s linear infinite;
+  }
+  @keyframes chkk {
+    0%, 53% { opacity: 0; transform: scale(.4); }
+    56% { opacity: 1; transform: scale(1.18); }
+    58% { transform: scale(1); }
+    62% { opacity: 1; }
+    65%, 100% { opacity: 0; }
+  }
+  .lbl2 { font-size: .68rem; color: #7a7361; animation: tilek 13.5s linear infinite; }
+
+  /* act 3 — a mini monitor whose wallpaper flows behind its icons */
+  .mmon { display: flex; flex-direction: column; align-items: center; animation: monk 13.5s linear infinite; }
+  @keyframes monk {
+    0%, 66% { opacity: 0; transform: scale(.72) translateY(10px); }
+    69% { opacity: 1; transform: scale(1) translateY(0); }
+    96% { opacity: 1; }
+    99%, 100% { opacity: 0; }
+  }
+  .mscr {
+    position: relative; width: 172px; height: 96px;
+    border-radius: 8px; border: 3px solid #14181d;
+    background: linear-gradient(115deg, #0c2830 10%, #155764 32%, #e79a50 55%, #133c46 78%, #0c2830 95%);
+    background-size: 320% 100%;
+    animation: mflow 6.5s linear infinite;
+    overflow: hidden;
+  }
+  @keyframes mflow { to { background-position: -420px 0; } }
+  .mi {
+    position: absolute; left: 9px; width: 11px; height: 11px;
+    border-radius: 3px; background: rgba(255,255,255,.75);
+    box-shadow: 0 1px 2px rgba(0,0,0,.3);
+  }
+  .mi:nth-child(1) { top: 9px; }
+  .mi:nth-child(2) { top: 27px; }
+  .mi:nth-child(3) { top: 45px; }
+  .mneck { width: 18px; height: 12px; background: #262c33; }
+  .mfoot { width: 52px; height: 5px; border-radius: 3px; background: #262c33; }
+
+  /* captions riding the same clock */
+  .caps {
+    position: absolute; left: 0; right: 0; bottom: 0; height: 32px;
+    border-top: 1.5px solid #ddd5c0;
     font-family: Consolas, ui-monospace, monospace;
-    font-size: .66rem; letter-spacing: .18em; color: var(--amber2);
+    font-size: .68rem; letter-spacing: .05em; color: #4c473a;
   }
-  .step h3 { font-size: clamp(.8rem, 1.35vw, .95rem); font-weight: 600; margin: .18rem 0 .1rem; }
-  .step p { font-size: clamp(.66rem, 1.05vw, .78rem); color: #b9b09b; line-height: 1.45; }
-  .step .track { height: 2px; background: rgba(255,255,255,.16); margin-top: .55rem; overflow: hidden; }
-  .step .track i { display: block; height: 100%; width: 0; background: var(--amber); }
-  .step.on .track i { animation: fill var(--stepms) linear forwards; }
-  @keyframes fill { to { width: 100%; } }
+  .cap {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; animation: 13.5s linear infinite;
+  }
+  .cp1 { animation-name: actv1; }
+  .cp2 { animation-name: actv2; }
+  .cp3 { animation-name: actv3; }
+  .cap b { color: #b3691f; margin-right: .45rem; }
 
   /* ---- windows-style toasts ---- */
   .toast {
@@ -246,13 +384,14 @@
     .screen { width: 100%; aspect-ratio: auto; height: 78vh; border-radius: 8px; }
     .neck, .foot { display: none; }
     .dicons { display: none; }
-    .steps { flex-direction: column; gap: .8rem; }
-    .step .track { display: none; }
-    .step { opacity: .85; }
+    .big br { display: none; }
+    .stage { height: 150px; }
   }
   @media (prefers-reduced-motion: reduce) {
-    .sun, .streak { animation: none !important; }
-    .step.on .track i { animation: none; width: 100%; }
+    .sun, .streak, .mscr { animation: none !important; }
+    .act, .cap, .chip, .mbtn, .cur, .tile, .prow, .prog i, .chk, .lbl2, .mmon { animation: none !important; }
+    .a1, .cp1 { opacity: 1; }
+    .chip, .cur { opacity: 1; transform: none; }
   }
 </style>
 </head>
@@ -281,31 +420,45 @@
 
       <div class="hud">
         <div class="brand">D R I F T P A P E R</div>
-        <p class="tag">Any video link becomes your live wallpaper — right behind your icons.</p>
+        <h1 class="big">Turn any video into your<br><em>live desktop wallpaper</em>.</h1>
         <div class="palette">
           <input type="url" id="link" placeholder="Paste a video link — YouTube or any video site…" spellcheck="false" aria-label="Video link">
           <button id="go">Set as wallpaper</button>
         </div>
         <p class="perr" id="err"></p>
 
-        <div class="steps" id="steps" style="--stepms: 3400ms">
-          <div class="step on">
-            <div class="k">STEP 1</div>
-            <h3>Paste a link</h3>
-            <p>YouTube or a direct video file. Short loops work best.</p>
-            <div class="track"><i></i></div>
+        <div class="stage" aria-label="How it works: paste a link, install once, your desktop comes alive">
+          <div class="act a1">
+            <div class="mbar">
+              <span class="chipwrap"><span class="chip">▶ video link</span></span>
+              <span class="mbtn">Set</span>
+              <svg class="cur c1" viewBox="0 0 20 20" aria-hidden="true">
+                <path d="M3 1 L3 16 L7 12.6 L9.4 18 L12.1 16.8 L9.7 11.5 L14.5 11 Z"
+                      fill="#fff" stroke="#20242a" stroke-width="1.4" stroke-linejoin="round"/>
+              </svg>
+            </div>
           </div>
-          <div class="step">
-            <div class="k">STEP 2 · FIRST TIME ONLY</div>
-            <h3>Install in a minute</h3>
-            <p>No admin rights, no account. Your browser asks once — “Open Driftpaper?”</p>
-            <div class="track"><i></i></div>
+          <div class="act a2">
+            <div class="scene2">
+              <div class="tile">▶</div>
+              <div class="prow">
+                <div class="prog"><i></i></div>
+                <div class="chk">✓</div>
+              </div>
+              <div class="lbl2">one-time · no admin rights</div>
+            </div>
           </div>
-          <div class="step">
-            <div class="k">STEP 3</div>
-            <h3>Your desktop comes alive</h3>
-            <p>Muted, looping, behind your icons. Pauses for games &amp; battery.</p>
-            <div class="track"><i></i></div>
+          <div class="act a3">
+            <div class="mmon">
+              <div class="mscr"><span class="mi"></span><span class="mi"></span><span class="mi"></span></div>
+              <div class="mneck"></div>
+              <div class="mfoot"></div>
+            </div>
+          </div>
+          <div class="caps">
+            <span class="cap cp1"><b>1</b> paste any video link — youtube or a direct file</span>
+            <span class="cap cp2"><b>2</b> first time only: install in about a minute</span>
+            <span class="cap cp3"><b>3</b> it plays behind your icons — muted, looping</span>
           </div>
         </div>
       </div>
@@ -393,18 +546,6 @@ document.querySelectorAll('.di').forEach(b =>
 // A first-timer's pasted link survives the install round-trip.
 const saved = localStorage.getItem('driftpaper-link');
 if (saved && !link.value) link.value = saved;
-
-// The quiet explainer: one step lit at a time.
-const steps = [...document.querySelectorAll('.step')];
-let cur = 0;
-setInterval(() => {
-  steps[cur].classList.remove('on');
-  cur = (cur + 1) % steps.length;
-  const s = steps[cur];
-  s.classList.add('on');
-  const bar = s.querySelector('.track i');
-  if (bar) { bar.style.animation = 'none'; void bar.offsetWidth; bar.style.animation = ''; }
-}, 3400);
 
 // A real clock in the taskbar — because it's a real desktop.
 function tick() {
