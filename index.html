@@ -73,18 +73,20 @@
     position: absolute; inset: 0;
     background: linear-gradient(180deg,
       var(--sea1) 0%, var(--sea2) 38%,
-      #6e5a44 62%, #c98festy 75%, #e79a50 100%);
-    background: linear-gradient(180deg,
-      var(--sea1) 0%, var(--sea2) 38%,
       #6e5a44 62%, #d8874e 78%, #e79a50 100%);
   }
   .sun {
-    position: absolute; left: 50%; top: 66%;
-    width: 42vmin; height: 42vmin; transform: translate(-50%, -50%);
-    background: radial-gradient(circle, rgba(243,181,115,.55) 0%, rgba(243,181,115,.12) 42%, transparent 68%);
+    position: absolute; left: 50%; top: 79%;
+    width: 34vmin; height: 34vmin; transform: translate(-50%, -50%);
+    background: radial-gradient(circle, rgba(248,196,138,.6) 0%, rgba(243,181,115,.14) 44%, transparent 68%);
     animation: breathe 16s ease-in-out infinite alternate;
   }
-  @keyframes breathe { to { transform: translate(-50%, -52%) scale(1.12); opacity: .85; } }
+  @keyframes breathe { to { transform: translate(-50%, -52%) scale(1.1); opacity: .85; } }
+  /* quiet scrim so the HUD text always reads against the dusk */
+  .shade {
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 62% 52% at 50% 52%, rgba(7,17,21,.42), transparent 72%);
+  }
   .streak {
     position: absolute; left: -30%; width: 160%; height: 2px;
     background: linear-gradient(90deg, transparent, rgba(255,224,186,.35), transparent);
@@ -166,7 +168,8 @@
     margin-top: clamp(.9rem, 2.4vh, 1.9rem);
     width: min(620px, 100%);
   }
-  .step { flex: 1; opacity: .34; transition: opacity .6s ease; color: #e9e3d4; }
+  .step { flex: 1; opacity: .45; transition: opacity .6s ease; color: #e9e3d4;
+          text-shadow: 0 1px 4px rgba(0,0,0,.45); }
   .step.on { opacity: 1; }
   .step .k {
     font-family: Consolas, ui-monospace, monospace;
@@ -264,6 +267,7 @@
         <div class="streak s1"></div>
         <div class="streak s2"></div>
         <div class="streak s3"></div>
+        <div class="shade"></div>
       </div>
 
       <div class="dicons">
