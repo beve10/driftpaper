@@ -203,16 +203,39 @@
   .a1 { animation-name: actv1; }
   .a2 { animation-name: actv2; }
   .a3 { animation-name: actv3; }
-  @keyframes actv1 { 0%,29% {opacity:1} 33%,96% {opacity:0} 100% {opacity:1} }
-  @keyframes actv2 { 0%,29% {opacity:0} 33%,62% {opacity:1} 66%,100% {opacity:0} }
-  @keyframes actv3 { 0%,62% {opacity:0} 66%,96% {opacity:1} 100% {opacity:0} }
+  /* acts lift in from below and out upward */
+  @keyframes actv1 {
+    0% { opacity: 1; transform: translateY(0); }
+    29% { opacity: 1; transform: translateY(0); }
+    33% { opacity: 0; transform: translateY(-9px); }
+    95% { opacity: 0; transform: translateY(9px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes actv2 {
+    0%, 29% { opacity: 0; transform: translateY(9px); }
+    33% { opacity: 1; transform: translateY(0); }
+    62% { opacity: 1; transform: translateY(0); }
+    66%, 100% { opacity: 0; transform: translateY(-9px); }
+  }
+  @keyframes actv3 {
+    0%, 62% { opacity: 0; transform: translateY(9px); }
+    66% { opacity: 1; transform: translateY(0); }
+    96% { opacity: 1; transform: translateY(0); }
+    100% { opacity: 0; transform: translateY(-9px); }
+  }
 
-  /* act 1 — a link chip drops into a mini bar, the cursor clicks Set */
+  /* act 1 — a link chip tumbles into the bar, the cursor clicks Set */
   .mbar {
     position: relative; width: min(320px, 82%); height: 46px;
     background: #e7e1d1; border-radius: 10px;
     display: flex; align-items: center; justify-content: flex-end;
     padding: 5px;
+    animation: barflash 13.5s linear infinite;
+  }
+  @keyframes barflash {
+    0%, 16% { box-shadow: 0 0 0 0 rgba(231,154,80,0); }
+    18% { box-shadow: 0 0 0 3px rgba(231,154,80,.5); }
+    23%, 100% { box-shadow: 0 0 0 0 rgba(231,154,80,0); }
   }
   .chipwrap { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); }
   .chip {
@@ -223,9 +246,12 @@
     animation: chipk 13.5s linear infinite;
   }
   @keyframes chipk {
-    0% { transform: translate(-70px,-56px) rotate(-9deg); opacity: 0; }
-    3% { opacity: 1; }
-    8% { transform: translate(0,0) rotate(0); }
+    0% { transform: translate(-74px,-58px) rotate(-10deg); opacity: 0;
+         animation-timing-function: cubic-bezier(.35,.4,.55,1); }
+    2.5% { opacity: 1; }
+    7% { transform: translate(0,3px) rotate(1.5deg);
+         animation-timing-function: cubic-bezier(.3,1.7,.5,1); }
+    9.5% { transform: translate(0,0) rotate(0); }
     29% { transform: translate(0,0); opacity: 1; }
     32%, 100% { opacity: 0; }
   }
@@ -236,9 +262,22 @@
     animation: btnk 13.5s linear infinite;
   }
   @keyframes btnk {
-    0%, 14% { background: #e79a50; transform: scale(1); }
-    15.5% { background: #f6c085; transform: scale(.93); }
-    17%, 100% { background: #e79a50; transform: scale(1); }
+    0%, 14.5% { background: #e79a50; transform: scale(1); }
+    15.5% { background: #f6c085; transform: scale(.9); }
+    17.5% { background: #f0aa64; transform: scale(1.05); }
+    19%, 100% { background: #e79a50; transform: scale(1); }
+  }
+  /* click ripple over the Set button */
+  .ring {
+    position: absolute; right: 24px; bottom: 16px;
+    width: 14px; height: 14px; border-radius: 50%;
+    border: 2px solid var(--amber); opacity: 0; pointer-events: none;
+    animation: ringk 13.5s linear infinite;
+  }
+  @keyframes ringk {
+    0%, 15% { opacity: 0; transform: scale(.4); }
+    16% { opacity: .9; animation-timing-function: cubic-bezier(.2,.6,.4,1); }
+    21%, 100% { opacity: 0; transform: scale(2.8); }
   }
   .cur {
     position: absolute; width: 20px; height: 20px; z-index: 2;
@@ -246,16 +285,19 @@
   }
   .c1 { right: 44px; bottom: 13px; animation: cur1k 13.5s linear infinite; }
   @keyframes cur1k {
-    0% { transform: translate(78px,52px); opacity: 0; }
+    0% { transform: translate(84px,56px); opacity: 0;
+         animation-timing-function: cubic-bezier(.2,.7,.25,1); }
     5% { opacity: 1; }
     12% { transform: translate(0,0); }
-    15% { transform: translate(0,0) scale(.8); }
-    17% { transform: translate(0,0) scale(1); }
+    14.5% { transform: translate(0,0) scale(1);
+            animation-timing-function: cubic-bezier(.4,0,.6,1); }
+    15.5% { transform: translate(0,0) scale(.78); }
+    17.5% { transform: translate(0,0) scale(1); }
     29% { opacity: 1; }
     32%, 100% { opacity: 0; }
   }
 
-  /* act 2 — the one-time install: tile, progress, check */
+  /* act 2 — the one-time install: tile pops, progress fills, check lands */
   .scene2 { display: flex; flex-direction: column; align-items: center; gap: .65rem; }
   .tile {
     width: 46px; height: 46px; border-radius: 12px;
@@ -265,16 +307,31 @@
     animation: tilek 13.5s linear infinite;
   }
   @keyframes tilek {
-    0%, 33% { opacity: 0; transform: scale(.55); }
-    36% { opacity: 1; transform: scale(1.07); }
-    38% { transform: scale(1); }
+    0%, 33% { opacity: 0; transform: scale(.5);
+              animation-timing-function: cubic-bezier(.3,1.6,.5,1); }
+    36.5% { opacity: 1; transform: scale(1.08); }
+    38.5% { transform: scale(.98); }
+    40% { transform: scale(1); }
+    56% { transform: scale(1); }
+    57.5% { transform: scale(1.07); }   /* bounces when the check lands */
+    59% { transform: scale(1); }
     62% { opacity: 1; }
     65%, 100% { opacity: 0; }
   }
-  .prow { display: flex; align-items: center; gap: .55rem; animation: tilek 13.5s linear infinite; }
+  .prow, .lbl2 { animation: fadeup2 13.5s linear infinite; }
+  @keyframes fadeup2 {
+    0%, 34% { opacity: 0; transform: translateY(6px); }
+    37.5% { opacity: 1; transform: translateY(0); }
+    62% { opacity: 1; }
+    65%, 100% { opacity: 0; }
+  }
+  .prow { display: flex; align-items: center; gap: .55rem; }
   .prog { width: 168px; height: 7px; border-radius: 5px; background: #ded7c2; overflow: hidden; }
   .prog i { display: block; height: 100%; width: 0; border-radius: 5px; background: var(--amber); animation: progk 13.5s linear infinite; }
-  @keyframes progk { 0%, 39% { width: 0; } 54%, 100% { width: 100%; } }
+  @keyframes progk {
+    0%, 39% { width: 0; animation-timing-function: cubic-bezier(.45,.05,.35,1); }
+    53.5%, 100% { width: 100%; }
+  }
   .chk {
     width: 20px; height: 20px; border-radius: 50%;
     background: #3f9d63; color: #fff; font-size: .68rem; font-weight: 700;
@@ -282,21 +339,25 @@
     animation: chkk 13.5s linear infinite;
   }
   @keyframes chkk {
-    0%, 53% { opacity: 0; transform: scale(.4); }
-    56% { opacity: 1; transform: scale(1.18); }
-    58% { transform: scale(1); }
+    0%, 53.5% { opacity: 0; transform: scale(.3);
+                animation-timing-function: cubic-bezier(.3,1.8,.5,1); }
+    56% { opacity: 1; transform: scale(1.25); }
+    58% { transform: scale(.95); }
+    59.5% { transform: scale(1); }
     62% { opacity: 1; }
     65%, 100% { opacity: 0; }
   }
-  .lbl2 { font-size: .68rem; color: #6a6455; animation: tilek 13.5s linear infinite; }
+  .lbl2 { font-size: .68rem; color: #6a6455; }
 
   /* act 3 — a mini monitor whose wallpaper flows behind its icons */
   .mmon { display: flex; flex-direction: column; align-items: center; animation: monk 13.5s linear infinite; }
   @keyframes monk {
-    0%, 66% { opacity: 0; transform: scale(.72) translateY(10px); }
-    69% { opacity: 1; transform: scale(1) translateY(0); }
-    96% { opacity: 1; }
-    99%, 100% { opacity: 0; }
+    0%, 66% { opacity: 0; transform: scale(.78) translateY(12px);
+              animation-timing-function: cubic-bezier(.3,1.5,.5,1); }
+    69.5% { opacity: 1; transform: scale(1.03) translateY(0); }
+    71.5% { transform: scale(1); }
+    96% { opacity: 1; transform: scale(1); }
+    100% { opacity: 0; transform: scale(1) translateY(-6px); }
   }
   .mscr {
     position: relative; width: 172px; height: 96px;
@@ -309,12 +370,35 @@
   @keyframes mflow { to { background-position: -420px 0; } }
   .mi {
     position: absolute; left: 9px; width: 11px; height: 11px;
-    border-radius: 3px; background: rgba(255,255,255,.75);
+    border-radius: 3px; background: rgba(255,255,255,.78);
     box-shadow: 0 1px 2px rgba(0,0,0,.3);
+    opacity: 0;
+    animation: 13.5s linear infinite;
   }
-  .mi:nth-child(1) { top: 9px; }
-  .mi:nth-child(2) { top: 27px; }
-  .mi:nth-child(3) { top: 45px; }
+  .mi:nth-child(1) { top: 9px; animation-name: mi1; }
+  .mi:nth-child(2) { top: 27px; animation-name: mi2; }
+  .mi:nth-child(3) { top: 45px; animation-name: mi3; }
+  @keyframes mi1 {
+    0%, 70% { opacity: 0; transform: scale(.4); }
+    72% { opacity: 1; transform: scale(1.2); }
+    73.5% { transform: scale(1); }
+    97% { opacity: 1; }
+    100% { opacity: 0; }
+  }
+  @keyframes mi2 {
+    0%, 72% { opacity: 0; transform: scale(.4); }
+    74% { opacity: 1; transform: scale(1.2); }
+    75.5% { transform: scale(1); }
+    97% { opacity: 1; }
+    100% { opacity: 0; }
+  }
+  @keyframes mi3 {
+    0%, 74% { opacity: 0; transform: scale(.4); }
+    76% { opacity: 1; transform: scale(1.2); }
+    77.5% { transform: scale(1); }
+    97% { opacity: 1; }
+    100% { opacity: 0; }
+  }
   .mneck { width: 18px; height: 12px; background: #262c33; }
   .mfoot { width: 52px; height: 5px; border-radius: 3px; background: #262c33; }
 
@@ -403,10 +487,12 @@
     .stage { height: 150px; }
   }
   @media (prefers-reduced-motion: reduce) {
-    .sun, .streak, .mscr { animation: none !important; }
-    .act, .cap, .chip, .mbtn, .cur, .tile, .prow, .prog i, .chk, .lbl2, .mmon { animation: none !important; }
-    .a1, .cp1 { opacity: 1; }
-    .chip, .cur { opacity: 1; transform: none; }
+    /* Background effects stop; the explainer must keep working — it IS the
+       content. It cycles at half speed instead of freezing. */
+    .sun, .streak, .di:first-child .bx { animation: none !important; }
+    .act, .cap, .mbar, .chip, .mbtn, .ring, .cur, .tile, .prow, .prog i, .chk,
+    .lbl2, .mmon, .mi { animation-duration: 27s !important; }
+    .mscr { animation-duration: 13s !important; }
   }
 </style>
 </head>
@@ -448,6 +534,7 @@
             <div class="mbar">
               <span class="chipwrap"><span class="chip">▶ video link</span></span>
               <span class="mbtn">Set</span>
+              <span class="ring"></span>
               <svg class="cur c1" viewBox="0 0 20 20" aria-hidden="true">
                 <path d="M3 1 L3 16 L7 12.6 L9.4 18 L12.1 16.8 L9.7 11.5 L14.5 11 Z"
                       fill="#fff" stroke="#20242a" stroke-width="1.4" stroke-linejoin="round"/>
