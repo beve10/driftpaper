@@ -198,28 +198,30 @@
     position: absolute; inset: 0 0 32px 0;
     display: grid; place-items: center;
     opacity: 0;
-    animation: 13.5s linear infinite;
+    animation: 11s linear infinite;
   }
   .a1 { animation-name: actv1; }
   .a2 { animation-name: actv2; }
   .a3 { animation-name: actv3; }
-  /* acts lift in from below and out upward */
+  /* acts lift in from below and out upward
+     windows: act1 0–34% · act2 34–63% · act3 63–100% (hero shot holds longest) */
   @keyframes actv1 {
     0% { opacity: 1; transform: translateY(0); }
-    29% { opacity: 1; transform: translateY(0); }
-    33% { opacity: 0; transform: translateY(-9px); }
-    95% { opacity: 0; transform: translateY(9px); }
+    30% { opacity: 1; transform: translateY(0); }
+    34% { opacity: 0; transform: translateY(-9px); }
+    95% { opacity: 0; transform: translateY(9px); animation-timing-function: cubic-bezier(.2,.9,.3,1); }
     100% { opacity: 1; transform: translateY(0); }
   }
   @keyframes actv2 {
-    0%, 29% { opacity: 0; transform: translateY(9px); }
-    33% { opacity: 1; transform: translateY(0); }
-    62% { opacity: 1; transform: translateY(0); }
-    66%, 100% { opacity: 0; transform: translateY(-9px); }
+    0%, 30% { opacity: 0; transform: translateY(9px); animation-timing-function: cubic-bezier(.2,.9,.3,1); }
+    34% { opacity: 1; transform: translateY(0); }
+    59% { opacity: 1; transform: translateY(0); }
+    63% { opacity: 0; transform: translateY(-9px); }
+    64%, 100% { opacity: 0; transform: translateY(9px); }
   }
   @keyframes actv3 {
-    0%, 62% { opacity: 0; transform: translateY(9px); }
-    66% { opacity: 1; transform: translateY(0); }
+    0%, 59% { opacity: 0; transform: translateY(9px); animation-timing-function: cubic-bezier(.2,.9,.3,1); }
+    63% { opacity: 1; transform: translateY(0); }
     96% { opacity: 1; transform: translateY(0); }
     100% { opacity: 0; transform: translateY(-9px); }
   }
@@ -230,12 +232,12 @@
     background: #e7e1d1; border-radius: 10px;
     display: flex; align-items: center; justify-content: flex-end;
     padding: 5px;
-    animation: barflash 13.5s linear infinite;
+    animation: barflash 11s linear infinite;
   }
   @keyframes barflash {
-    0%, 16% { box-shadow: 0 0 0 0 rgba(231,154,80,0); }
-    18% { box-shadow: 0 0 0 3px rgba(231,154,80,.5); }
-    23%, 100% { box-shadow: 0 0 0 0 rgba(231,154,80,0); }
+    0%, 14% { box-shadow: 0 0 0 0 rgba(231,154,80,0); }
+    16% { box-shadow: 0 0 0 3px rgba(231,154,80,.55); }
+    21%, 100% { box-shadow: 0 0 0 0 rgba(231,154,80,0); }
   }
   .chipwrap { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); }
   .chip {
@@ -243,58 +245,58 @@
     background: #fff; color: #35322a; border: 1.5px solid #cfc7b2;
     font-size: .72rem; font-weight: 600;
     padding: .3rem .65rem; border-radius: 999px;
-    animation: chipk 13.5s linear infinite;
+    animation: chipk 11s linear infinite;
   }
   @keyframes chipk {
     0% { transform: translate(-74px,-58px) rotate(-10deg); opacity: 0;
-         animation-timing-function: cubic-bezier(.35,.4,.55,1); }
-    2.5% { opacity: 1; }
-    7% { transform: translate(0,3px) rotate(1.5deg);
-         animation-timing-function: cubic-bezier(.3,1.7,.5,1); }
-    9.5% { transform: translate(0,0) rotate(0); }
-    29% { transform: translate(0,0); opacity: 1; }
-    32%, 100% { opacity: 0; }
+         animation-timing-function: cubic-bezier(.3,.5,.5,1); }
+    2% { opacity: 1; }
+    6% { transform: translate(0,4px) rotate(2deg);
+         animation-timing-function: cubic-bezier(.25,1.9,.45,1); }
+    8.5% { transform: translate(0,0) rotate(0); }
+    30% { transform: translate(0,0); opacity: 1; }
+    33.5%, 100% { opacity: 0; }
   }
   .mbtn {
     background: var(--amber); color: #2b1a08;
     font-size: .74rem; font-weight: 700;
     padding: .5rem .85rem; border-radius: 8px;
-    animation: btnk 13.5s linear infinite;
+    animation: btnk 11s linear infinite;
   }
   @keyframes btnk {
-    0%, 14.5% { background: #e79a50; transform: scale(1); }
-    15.5% { background: #f6c085; transform: scale(.9); }
-    17.5% { background: #f0aa64; transform: scale(1.05); }
-    19%, 100% { background: #e79a50; transform: scale(1); }
+    0%, 12.5% { background: #e79a50; transform: scale(1); }
+    13.5% { background: #f6c085; transform: scale(.88); }
+    15.5% { background: #f0aa64; transform: scale(1.07); }
+    17%, 100% { background: #e79a50; transform: scale(1); }
   }
   /* click ripple over the Set button */
   .ring {
     position: absolute; right: 24px; bottom: 16px;
     width: 14px; height: 14px; border-radius: 50%;
     border: 2px solid var(--amber); opacity: 0; pointer-events: none;
-    animation: ringk 13.5s linear infinite;
+    animation: ringk 11s linear infinite;
   }
   @keyframes ringk {
-    0%, 15% { opacity: 0; transform: scale(.4); }
-    16% { opacity: .9; animation-timing-function: cubic-bezier(.2,.6,.4,1); }
-    21%, 100% { opacity: 0; transform: scale(2.8); }
+    0%, 13.5% { opacity: 0; transform: scale(.4); }
+    14.5% { opacity: .95; animation-timing-function: cubic-bezier(.15,.6,.35,1); }
+    19.5%, 100% { opacity: 0; transform: scale(3); }
   }
   .cur {
     position: absolute; width: 20px; height: 20px; z-index: 2;
     filter: drop-shadow(0 2px 3px rgba(0,0,0,.35));
   }
-  .c1 { right: 44px; bottom: 13px; animation: cur1k 13.5s linear infinite; }
+  .c1 { right: 44px; bottom: 13px; animation: cur1k 11s linear infinite; }
   @keyframes cur1k {
     0% { transform: translate(84px,56px); opacity: 0;
-         animation-timing-function: cubic-bezier(.2,.7,.25,1); }
-    5% { opacity: 1; }
-    12% { transform: translate(0,0); }
-    14.5% { transform: translate(0,0) scale(1);
+         animation-timing-function: cubic-bezier(.15,.75,.2,1); }
+    4% { opacity: 1; }
+    10.5% { transform: translate(0,0); }
+    12.5% { transform: translate(0,0) scale(1);
             animation-timing-function: cubic-bezier(.4,0,.6,1); }
-    15.5% { transform: translate(0,0) scale(.78); }
-    17.5% { transform: translate(0,0) scale(1); }
-    29% { opacity: 1; }
-    32%, 100% { opacity: 0; }
+    13.5% { transform: translate(0,0) scale(.76); }
+    15.5% { transform: translate(0,0) scale(1); }
+    30% { opacity: 1; }
+    33.5%, 100% { opacity: 0; }
   }
 
   /* act 2 — the one-time install: tile pops, progress fills, check lands */
@@ -304,67 +306,68 @@
     background: linear-gradient(160deg, #2c333b, #171c22);
     color: var(--amber2); font-size: 1.05rem;
     display: grid; place-items: center;
-    animation: tilek 13.5s linear infinite;
+    animation: tilek 11s linear infinite;
   }
   @keyframes tilek {
-    0%, 33% { opacity: 0; transform: scale(.5);
-              animation-timing-function: cubic-bezier(.3,1.6,.5,1); }
-    36.5% { opacity: 1; transform: scale(1.08); }
-    38.5% { transform: scale(.98); }
-    40% { transform: scale(1); }
+    0%, 34% { opacity: 0; transform: scale(.48);
+              animation-timing-function: cubic-bezier(.25,1.75,.45,1); }
+    37% { opacity: 1; transform: scale(1.1); }
+    39% { transform: scale(.97); }
+    40.5% { transform: scale(1); }
+    53% { transform: scale(1); }
+    54.5% { transform: scale(1.08); }   /* bounces when the check lands */
     56% { transform: scale(1); }
-    57.5% { transform: scale(1.07); }   /* bounces when the check lands */
-    59% { transform: scale(1); }
-    62% { opacity: 1; }
-    65%, 100% { opacity: 0; }
+    59% { opacity: 1; }
+    62.5%, 100% { opacity: 0; }
   }
-  .prow, .lbl2 { animation: fadeup2 13.5s linear infinite; }
+  .prow, .lbl2 { animation: fadeup2 11s linear infinite; }
   @keyframes fadeup2 {
-    0%, 34% { opacity: 0; transform: translateY(6px); }
-    37.5% { opacity: 1; transform: translateY(0); }
-    62% { opacity: 1; }
-    65%, 100% { opacity: 0; }
+    0%, 35% { opacity: 0; transform: translateY(7px);
+              animation-timing-function: cubic-bezier(.2,.9,.3,1); }
+    38% { opacity: 1; transform: translateY(0); }
+    59% { opacity: 1; }
+    62.5%, 100% { opacity: 0; }
   }
   .prow { display: flex; align-items: center; gap: .55rem; }
   .prog { width: 168px; height: 7px; border-radius: 5px; background: #ded7c2; overflow: hidden; }
-  .prog i { display: block; height: 100%; width: 0; border-radius: 5px; background: var(--amber); animation: progk 13.5s linear infinite; }
+  .prog i { display: block; height: 100%; width: 0; border-radius: 5px; background: var(--amber); animation: progk 11s linear infinite; }
   @keyframes progk {
-    0%, 39% { width: 0; animation-timing-function: cubic-bezier(.45,.05,.35,1); }
-    53.5%, 100% { width: 100%; }
+    0%, 39% { width: 0; animation-timing-function: cubic-bezier(.55,.05,.25,1); }
+    52%, 100% { width: 100%; }
   }
   .chk {
     width: 20px; height: 20px; border-radius: 50%;
     background: #3f9d63; color: #fff; font-size: .68rem; font-weight: 700;
     display: grid; place-items: center;
-    animation: chkk 13.5s linear infinite;
+    animation: chkk 11s linear infinite;
   }
   @keyframes chkk {
-    0%, 53.5% { opacity: 0; transform: scale(.3);
-                animation-timing-function: cubic-bezier(.3,1.8,.5,1); }
-    56% { opacity: 1; transform: scale(1.25); }
-    58% { transform: scale(.95); }
-    59.5% { transform: scale(1); }
-    62% { opacity: 1; }
-    65%, 100% { opacity: 0; }
+    0%, 52% { opacity: 0; transform: scale(.25);
+              animation-timing-function: cubic-bezier(.3,1.9,.45,1); }
+    54% { opacity: 1; transform: scale(1.3); }
+    55.5% { transform: scale(.94); }
+    57% { transform: scale(1); }
+    59% { opacity: 1; }
+    62.5%, 100% { opacity: 0; }
   }
   .lbl2 { font-size: .68rem; color: #6a6455; }
 
   /* act 3 — a mini monitor whose wallpaper flows behind its icons */
-  .mmon { display: flex; flex-direction: column; align-items: center; animation: monk 13.5s linear infinite; }
+  .mmon { display: flex; flex-direction: column; align-items: center; animation: monk 11s linear infinite; }
   @keyframes monk {
-    0%, 66% { opacity: 0; transform: scale(.78) translateY(12px);
-              animation-timing-function: cubic-bezier(.3,1.5,.5,1); }
-    69.5% { opacity: 1; transform: scale(1.03) translateY(0); }
-    71.5% { transform: scale(1); }
+    0%, 63% { opacity: 0; transform: scale(.76) translateY(13px);
+              animation-timing-function: cubic-bezier(.25,1.65,.45,1); }
+    66.5% { opacity: 1; transform: scale(1.05) translateY(0); }
+    68.5% { transform: scale(1); }
     96% { opacity: 1; transform: scale(1); }
-    100% { opacity: 0; transform: scale(1) translateY(-6px); }
+    100% { opacity: 0; transform: scale(1) translateY(-7px); }
   }
   .mscr {
     position: relative; width: 172px; height: 96px;
     border-radius: 8px; border: 3px solid #14181d;
     background: linear-gradient(115deg, #0c2830 10%, #155764 32%, #e79a50 55%, #133c46 78%, #0c2830 95%);
     background-size: 320% 100%;
-    animation: mflow 6.5s linear infinite;
+    animation: mflow 5.5s linear infinite;
     overflow: hidden;
   }
   @keyframes mflow { to { background-position: -420px 0; } }
@@ -373,29 +376,29 @@
     border-radius: 3px; background: rgba(255,255,255,.78);
     box-shadow: 0 1px 2px rgba(0,0,0,.3);
     opacity: 0;
-    animation: 13.5s linear infinite;
+    animation: 11s linear infinite;
   }
   .mi:nth-child(1) { top: 9px; animation-name: mi1; }
   .mi:nth-child(2) { top: 27px; animation-name: mi2; }
   .mi:nth-child(3) { top: 45px; animation-name: mi3; }
   @keyframes mi1 {
-    0%, 70% { opacity: 0; transform: scale(.4); }
-    72% { opacity: 1; transform: scale(1.2); }
-    73.5% { transform: scale(1); }
+    0%, 67% { opacity: 0; transform: scale(.35); }
+    69% { opacity: 1; transform: scale(1.25); }
+    70.5% { transform: scale(1); }
     97% { opacity: 1; }
     100% { opacity: 0; }
   }
   @keyframes mi2 {
-    0%, 72% { opacity: 0; transform: scale(.4); }
-    74% { opacity: 1; transform: scale(1.2); }
-    75.5% { transform: scale(1); }
+    0%, 69% { opacity: 0; transform: scale(.35); }
+    71% { opacity: 1; transform: scale(1.25); }
+    72.5% { transform: scale(1); }
     97% { opacity: 1; }
     100% { opacity: 0; }
   }
   @keyframes mi3 {
-    0%, 74% { opacity: 0; transform: scale(.4); }
-    76% { opacity: 1; transform: scale(1.2); }
-    77.5% { transform: scale(1); }
+    0%, 71% { opacity: 0; transform: scale(.35); }
+    73% { opacity: 1; transform: scale(1.25); }
+    74.5% { transform: scale(1); }
     97% { opacity: 1; }
     100% { opacity: 0; }
   }
@@ -412,7 +415,7 @@
   .cap {
     position: absolute; inset: 0;
     display: flex; align-items: center; justify-content: center;
-    opacity: 0; animation: 13.5s linear infinite;
+    opacity: 0; animation: 11s linear infinite;
   }
   .cp1 { animation-name: actv1; }
   .cp2 { animation-name: actv2; }
@@ -491,8 +494,8 @@
        content. It cycles at half speed instead of freezing. */
     .sun, .streak, .di:first-child .bx { animation: none !important; }
     .act, .cap, .mbar, .chip, .mbtn, .ring, .cur, .tile, .prow, .prog i, .chk,
-    .lbl2, .mmon, .mi { animation-duration: 27s !important; }
-    .mscr { animation-duration: 13s !important; }
+    .lbl2, .mmon, .mi { animation-duration: 22s !important; }
+    .mscr { animation-duration: 11s !important; }
   }
 </style>
 </head>
