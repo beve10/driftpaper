@@ -9,6 +9,7 @@
 <meta property="og:description" content="Any video link becomes your animated Windows wallpaper. Runs entirely on your PC.">
 <meta property="og:image" content="https://beve10.github.io/driftpaper/icon.png">
 <link rel="icon" type="image/png" href="icon.png">
+<meta name="theme-color" content="#eceae4">
 <style>
   :root {
     --bone: #eceae4;
@@ -117,6 +118,16 @@
   }
   .di:hover .bx { background: rgba(255,255,255,.26); transform: translateY(-2px); }
   .di:focus-visible { outline: 2px solid var(--amber2); outline-offset: 3px; }
+  /* one gentle beckon on load, so the demos read as clickable */
+  .di:first-child .bx { animation: beckon 1.5s ease 1.4s 2; }
+  @keyframes beckon { 50% { transform: scale(1.14); background: rgba(255,255,255,.3); } }
+  .tryhint {
+    width: 74px; text-align: center;
+    font-family: Consolas, ui-monospace, monospace;
+    font-size: .58rem; letter-spacing: .04em;
+    color: #f0e2c6; opacity: .9;
+    text-shadow: 0 1px 3px rgba(0,0,0,.55);
+  }
 
   /* ---- centered command palette ---- */
   .hud {
@@ -158,6 +169,10 @@
     color: #f4f1e8;
   }
   .palette input::placeholder { color: #9fb3b3; }
+  .palette input:focus-visible { box-shadow: inset 0 0 0 2px var(--amber); }
+  .palette button:focus-visible, .caption a:focus-visible, .toast a:focus-visible {
+    outline: 2px solid var(--amber2); outline-offset: 2px;
+  }
   .palette button {
     font: inherit; font-weight: 700; font-size: clamp(.84rem, 1.3vw, .94rem);
     padding: 0 1.5rem; border: 0; cursor: pointer;
@@ -229,7 +244,7 @@
     position: absolute; width: 20px; height: 20px; z-index: 2;
     filter: drop-shadow(0 2px 3px rgba(0,0,0,.35));
   }
-  .c1 { right: 44px; bottom: 30px; animation: cur1k 13.5s linear infinite; }
+  .c1 { right: 44px; bottom: 13px; animation: cur1k 13.5s linear infinite; }
   @keyframes cur1k {
     0% { transform: translate(78px,52px); opacity: 0; }
     5% { opacity: 1; }
@@ -273,7 +288,7 @@
     62% { opacity: 1; }
     65%, 100% { opacity: 0; }
   }
-  .lbl2 { font-size: .68rem; color: #7a7361; animation: tilek 13.5s linear infinite; }
+  .lbl2 { font-size: .68rem; color: #6a6455; animation: tilek 13.5s linear infinite; }
 
   /* act 3 — a mini monitor whose wallpaper flows behind its icons */
   .mmon { display: flex; flex-direction: column; align-items: center; animation: monk 13.5s linear infinite; }
@@ -371,11 +386,11 @@
   .caption {
     margin-top: 1.15rem; text-align: center;
     font-family: Consolas, ui-monospace, monospace;
-    font-size: .72rem; color: var(--mut); line-height: 1.9;
+    font-size: .72rem; color: #665f4f; line-height: 1.9;
   }
-  .caption a { color: #6d6759; }
+  .caption a { color: #565043; padding: .2rem .15rem; }
   .caption a:hover { color: var(--inkc); }
-  .caption .dlm { color: #b06a28; font-weight: 700; text-decoration: none; border-bottom: 1px solid #d9b993; }
+  .caption .dlm { color: #8f5116; font-weight: 700; text-decoration: none; border-bottom: 1px solid #c9a06a; }
   .caption .dlm:hover { color: var(--inkc); border-color: var(--inkc); }
   .osnote { display: none; color: #b06a28; }
 
@@ -416,6 +431,7 @@
         <button class="di" data-url="https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/1080/Big_Buck_Bunny_1080_10s_5MB.mp4" title="Set this demo as your wallpaper">
           <span class="bx">▶</span>bunny.mp4
         </button>
+        <div class="tryhint">↑ click one<br>to try it live</div>
       </div>
 
       <div class="hud">
@@ -463,13 +479,13 @@
         </div>
       </div>
 
-      <div class="toast" id="note">
+      <div class="toast" id="note" role="status" aria-live="polite">
         <div class="t ok-t"><img src="icon.png" alt="">Sent to Driftpaper ✓</div>
         If it's your first time: click <b>Open</b> in the browser dialog, then allow the video site
         when Driftpaper asks. Next time it's one click.
       </div>
 
-      <div class="toast" id="install">
+      <div class="toast" id="install" role="status" aria-live="polite">
         <div class="t get-t"><img src="icon.png" alt="">Driftpaper isn't installed — downloading…</div>
         Run <b>DriftpaperSetup.exe</b> when it finishes. One-time setup · no admin · ~100 MB.
         <a class="get-btn" id="manualdl" href="https://github.com/beve10/driftpaper/releases/download/v0.1.0/DriftpaperSetup.exe">Download didn't start? Click here</a>
