@@ -189,18 +189,24 @@
   .palette button:hover { background: var(--amber2); }
   .perr { min-height: .9rem; margin-top: .45rem; font-size: .82rem; color: #ffb4a1; text-shadow: 0 1px 3px rgba(0,0,0,.5); }
 
-  /* ---- local-file drop: a compact cue under the paste bar ---- */
-  .dropcue {
-    display: inline-flex; align-items: center; gap: .45rem;
-    margin-top: .55rem;
-    font: inherit; font-size: clamp(.74rem, 1.1vw, .84rem);
-    color: #c9bfa8; background: none; border: 0; cursor: pointer;
-    padding: .25rem .3rem;
-    transition: color .15s;
+  /* ---- local-file: a drop-zone box under the paste bar ---- */
+  .pcbox {
+    display: flex; align-items: center; justify-content: center; gap: .55rem;
+    width: min(620px, 100%); margin-top: .6rem;
+    padding: .7rem 1rem;
+    font: inherit; font-size: clamp(.78rem, 1.15vw, .88rem);
+    color: #cabfa6; cursor: pointer;
+    background: rgba(255,255,255,.04);
+    border: 1.5px dashed rgba(255,255,255,.28); border-radius: 11px;
+    transition: border-color .15s, color .15s, background .15s;
   }
-  .dropcue:hover, .dropcue:focus-visible { color: #f4eee0; outline: none; }
-  .dropcue svg { width: 15px; height: 15px; opacity: .85; }
-  .dropcue u { text-underline-offset: 3px; text-decoration-color: rgba(243,181,115,.6); }
+  .pcbox:hover, .pcbox:focus-visible, .pcbox.drag {
+    color: #f6f0e2; border-color: var(--amber2);
+    background: rgba(231,154,80,.1); outline: none;
+  }
+  .pcbox.drag { border-style: solid; }
+  .pcbox svg { width: 16px; height: 16px; opacity: .85; flex: none; }
+  .pcbox b { color: #ecdcc2; font-weight: 600; }
 
   /* the full-screen drag target that appears while a file is over the window */
   .dropzone {
@@ -601,11 +607,11 @@
           <input type="url" id="link" placeholder="Paste a video link — YouTube or any video site…" spellcheck="false" aria-label="Video link">
           <button id="go">Set as wallpaper</button>
         </div>
-        <button class="dropcue" id="dropcue" type="button">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M12 15V3M12 15l-4-4M12 15l4-4"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/>
+        <button class="pcbox" id="pcbox" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 16V4M12 4 8 8M12 4l4 4"/><path d="M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/>
           </svg>
-          or <u>drop a video file</u> from your computer
+          <span>Or use a video from your PC — <b>drag &amp; drop here, or browse</b></span>
         </button>
         <input type="file" id="filepick" accept="video/mp4,video/webm,video/x-matroska,video/quicktime,.mp4,.webm,.mkv,.mov,.m4v" hidden>
         <p class="perr" id="err"></p>
@@ -664,8 +670,8 @@
       <div class="dropzone" id="dropzone" aria-hidden="true">
         <div class="dz-inner">
           <div class="arrow">⤓</div>
-          <h3>Drop your video</h3>
-          <p>release to set it live behind your icons</p>
+          <h3>Release to add your video</h3>
+          <p>Driftpaper opens so you can drop it in</p>
         </div>
       </div>
     </div>
@@ -731,11 +737,17 @@ document.querySelectorAll('.di').forEach(b =>
 const saved = localStorage.getItem('driftpaper-link');
 if (saved && !link.value) link.value = saved;
 
-// ---- local file → wallpaper (via the app's loopback server) ----
-const LOOPBACK = 'http://127.0.0.1:47923/local';
+// ---- local file → wallpaper (dropped right here on the page) ----
+// The page sends the dropped file's bytes to the app's loopback server.
+// Some browsers gate page→localhost behind a one-time "allow local network"
+// permission; if yours hard-blocks it, we fall back to the app's own picker
+// so a local video still works either way.
+const pcbox = document.getElementById('pcbox');
 const dropzone = document.getElementById('dropzone');
 const filepick = document.getElementById('filepick');
+const LOOPBACK = 'http://127.0.0.1:47923/local';
 const VIDEO_RE = /\.(mp4|webm|mkv|mov|m4v)$/i;
+const delay = ms => new Promise(r => setTimeout(r, ms));
 
 async function postLocal(file) {
   try {
@@ -744,7 +756,6 @@ async function postLocal(file) {
     return r.ok;
   } catch { return false; }
 }
-const delay = ms => new Promise(r => setTimeout(r, ms));
 
 async function handleLocalFile(file) {
   err.textContent = '';
@@ -755,53 +766,72 @@ async function handleLocalFile(file) {
     err.textContent = "That's not a video file — try .mp4, .webm, .mkv or .mov.";
     return;
   }
+  setPcbox('Sending to Driftpaper…');
 
-  // 1) app already running? hand the bytes straight over.
-  if (await postLocal(file)) { showLocalOk(file); return; }
+  // 1) straight to the app — works if it's running and the browser allows it.
+  if (await postLocal(file)) return okLocal(file);
 
-  // 2) maybe installed but asleep — wake it, then retry a few times.
+  // 2) maybe asleep: wake it (also cold-starts a fresh install), then retry.
   if (!dryRun) location.href = 'driftpaper://open';
-  for (let i = 0; i < 6; i++) {
-    await delay(600);
-    if (await postLocal(file)) { showLocalOk(file); return; }
-  }
+  for (let i = 0; i < 6; i++) { await delay(600); if (await postLocal(file)) return okLocal(file); }
 
-  // 3) not installed / unreachable — offer the app, like the link path does.
-  installPanel.classList.add('show');
-  document.getElementById('manualdl').click();
+  // 3) browser hard-blocks page→app, or it's not installed. Ask the app to
+  //    open its own picker; if nothing opens, it's not installed.
+  let left = false;
+  const onLeave = () => { left = true; };
+  window.addEventListener('blur', onLeave);
+  document.addEventListener('visibilitychange', onLeave);
+  if (!dryRun) location.href = 'driftpaper://pick';
+  await delay(2200);
+  window.removeEventListener('blur', onLeave);
+  document.removeEventListener('visibilitychange', onLeave);
+  resetPcbox();
+  if (left) {
+    showNote('Driftpaper is open',
+      "Your browser wouldn't pass the file directly, so drop it into Driftpaper's window — or click Browse.");
+  } else {
+    installPanel.classList.add('show');
+    document.getElementById('manualdl').click();
+  }
 }
 
-function showLocalOk(file) {
+function okLocal(file) {
+  resetPcbox();
   const safe = file.name.replace(/[<>&]/g, c => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;' }[c]));
-  note.innerHTML =
-    '<div class="t ok-t"><img src="icon.png" alt="">Now playing ✓</div>' +
-    '<b>' + safe + '</b> is live behind your icons. Drop another any time — or paste a link.';
+  showNote('Now playing ✓', '<b>' + safe + '</b> is live behind your icons. Drop another any time.');
+}
+function showNote(title, html) {
+  note.innerHTML = '<div class="t ok-t"><img src="icon.png" alt="">' + title + '</div>' + html;
   note.classList.add('show');
   setTimeout(() => note.classList.remove('show'), 9000);
 }
+const pcLabel = pcbox.querySelector('span');
+const pcLabelHtml = pcLabel.innerHTML;
+function setPcbox(t) { pcLabel.textContent = t; }
+function resetPcbox() { pcLabel.innerHTML = pcLabelHtml; }
 
-// full-window drag affordance (only reacts to files being dragged in)
-let dragDepth = 0;
+// click the box → choose a file
+pcbox.addEventListener('click', () => filepick.click());
+filepick.addEventListener('change', () => { if (filepick.files[0]) handleLocalFile(filepick.files[0]); filepick.value = ''; });
+
+// drag a file anywhere onto the page → highlight the zone, drop → send it
 function hasFiles(e) { return [...(e.dataTransfer?.types || [])].includes('Files'); }
+let dragDepth = 0;
 window.addEventListener('dragenter', e => {
   if (!hasFiles(e)) return;
-  e.preventDefault(); dragDepth++; dropzone.classList.add('on');
+  e.preventDefault(); dragDepth++; dropzone.classList.add('on'); pcbox.classList.add('drag');
 });
 window.addEventListener('dragover', e => { if (hasFiles(e)) e.preventDefault(); });
 window.addEventListener('dragleave', e => {
   if (!hasFiles(e)) return;
   dragDepth = Math.max(0, dragDepth - 1);
-  if (dragDepth === 0) dropzone.classList.remove('on');
+  if (dragDepth === 0) { dropzone.classList.remove('on'); pcbox.classList.remove('drag'); }
 });
 window.addEventListener('drop', e => {
   if (!hasFiles(e)) return;
-  e.preventDefault(); dragDepth = 0; dropzone.classList.remove('on');
+  e.preventDefault(); dragDepth = 0; dropzone.classList.remove('on'); pcbox.classList.remove('drag');
   handleLocalFile(e.dataTransfer.files[0]);
 });
-
-// the cue also opens a normal file picker
-document.getElementById('dropcue').addEventListener('click', () => filepick.click());
-filepick.addEventListener('change', () => { if (filepick.files[0]) handleLocalFile(filepick.files[0]); });
 
 // A real clock in the taskbar — because it's a real desktop.
 function tick() {
