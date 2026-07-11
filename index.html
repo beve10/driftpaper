@@ -88,6 +88,21 @@
     position: absolute; inset: 0;
     background: radial-gradient(ellipse 62% 52% at 50% 52%, rgba(7,17,21,.42), transparent 72%);
   }
+  /* reciprocity: the real video previews INSIDE the monitor, before any install */
+  .wallvid {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%; object-fit: cover;
+  }
+  .pvpill {
+    position: absolute; top: 12px; right: 14px; z-index: 6;
+    font-family: Consolas, ui-monospace, monospace;
+    font-size: .62rem; letter-spacing: .1em;
+    color: #f6e9d2; background: rgba(10, 22, 26, .72);
+    border: 1px solid rgba(243,181,115,.45);
+    padding: .3rem .6rem; border-radius: 999px;
+    opacity: 0; transition: opacity .3s ease; pointer-events: none;
+  }
+  .pvpill.on { opacity: 1; }
   .streak {
     position: absolute; left: -30%; width: 160%; height: 2px;
     background: linear-gradient(90deg, transparent, rgba(255,224,186,.35), transparent);
@@ -520,6 +535,17 @@
   .toast .t img { width: 16px; height: 16px; border-radius: 4px; }
   .toast .ok-t { color: #9fd8a9; }
   .toast .get-t { color: var(--amber2); }
+  /* goal gradient: the first-time flow never starts at zero */
+  .itrack {
+    height: 4px; border-radius: 3px; overflow: hidden;
+    background: rgba(255,255,255,.16); margin: .55rem 0 .6rem;
+  }
+  .itrack i { display: block; height: 100%; width: 33%; border-radius: 3px; background: var(--amber); }
+  .isteps { list-style: none; margin: 0 0 .2rem; padding: 0; font-size: .78rem; }
+  .isteps li { margin: .32rem 0; line-height: 1.45; }
+  .isteps .done { color: #9fd8a9; }
+  .isteps .now { color: #ece7da; }
+  .isteps .next { color: #a49b87; }
   .toast a.get-btn {
     display: block; text-align: center; margin: .6rem 0 .35rem;
     padding: .6rem .9rem; border-radius: 7px;
@@ -589,6 +615,7 @@
         <div class="streak s3"></div>
         <div class="shade"></div>
       </div>
+      <span class="pvpill" id="pvpill">LIVE PREVIEW · install to make it yours</span>
 
       <div class="dicons">
         <button class="di" data-url="https://test-videos.co.uk/vids/jellyfish/mp4/h264/1080/Jellyfish_1080_10s_5MB.mp4" title="Set this demo as your wallpaper">
@@ -651,11 +678,17 @@
       </div>
 
       <div class="toast" id="install" role="status" aria-live="polite">
-        <div class="t get-t"><img src="icon.png" alt="">Driftpaper isn't installed — downloading…</div>
-        Run <b>DriftpaperSetup.exe</b> when it finishes. One-time setup · no admin · ~100 MB.
+        <div class="t get-t"><img src="icon.png" alt="">One step to go — you're already a third done</div>
+        <div class="itrack"><i></i></div>
+        <ul class="isteps">
+          <li class="done">✓&nbsp; Wallpaper chosen — <b id="pickname">your video</b> is saved &amp; waiting</li>
+          <li class="now">●&nbsp; Run <b>DriftpaperSetup.exe</b> from your downloads — downloading now
+            <span class="fine">(one-time, about a minute · ~100 MB — smaller than most game updates · no admin)</span></li>
+          <li class="next">○&nbsp; Come back &amp; click <b>Set</b> — your desktop comes alive</li>
+        </ul>
         <a class="get-btn" id="manualdl" href="https://github.com/beve10/driftpaper/releases/download/v0.1.0/DriftpaperSetup.exe">Download didn't start? Click here</a>
-        <span class="fine">SmartScreen may warn (unsigned beta): “More info → Run anyway”.
-        Your link stays saved here — click Set again afterwards.</span>
+        <span class="fine">Until then your desktop stays frozen. SmartScreen may warn (unsigned beta):
+        “More info → Run anyway”.</span>
       </div>
 
       <div class="taskbar">
@@ -681,7 +714,7 @@
 
   <p class="caption">
     free while in beta · windows 10/11 (64-bit) · no admin rights · runs entirely on your pc — videos never touch our servers<br>
-    <a class="dlm" href="https://github.com/beve10/driftpaper/releases/download/v0.1.0/DriftpaperSetup.exe">⬇ DriftpaperSetup.exe (~100 MB)</a>
+    <a class="dlm" href="https://github.com/beve10/driftpaper/releases/download/v0.1.0/DriftpaperSetup.exe">⬇ DriftpaperSetup.exe — ~100 MB, smaller than most game updates</a>
     &nbsp;·&nbsp; <a href="https://github.com/beve10/driftpaper" target="_blank" rel="noopener">github</a>
     &nbsp;·&nbsp; <a href="https://github.com/beve10/driftpaper/releases" target="_blank" rel="noopener">releases</a>
     <span class="osnote" id="osnote"><br>⚠ you're not on windows — driftpaper is a windows app; open this page on your pc.</span>
@@ -703,6 +736,8 @@ function fire(raw) {
   if (!v) { err.textContent = 'Paste a video link first.'; return; }
   if (!/^https:\/\//i.test(v)) { err.textContent = 'Links must start with https://'; return; }
   localStorage.setItem('driftpaper-link', v);
+  setPickName(nameFor(v));
+  previewInMonitor(v);
 
   // If Driftpaper launches, this page loses focus within ~2s.
   // No focus loss = the protocol went nowhere = the app isn't installed.
@@ -737,6 +772,57 @@ document.querySelectorAll('.di').forEach(b =>
 const saved = localStorage.getItem('driftpaper-link');
 if (saved && !link.value) link.value = saved;
 
+// Smart default: never greet the user with a blank field. Most people keep
+// defaults — their job becomes "press Set", not "produce a link from nothing".
+const DEFAULT_LINK = 'https://test-videos.co.uk/vids/jellyfish/mp4/h264/1080/Jellyfish_1080_10s_5MB.mp4';
+if (!link.value) link.value = DEFAULT_LINK;
+link.addEventListener('focus', () => link.select()); // pasting over it = one keystroke
+
+// Endowment: the first-time panel names THEIR pick, so leaving means
+// abandoning something that's already theirs.
+function nameFor(v) {
+  try {
+    const u = new URL(v);
+    if (/youtu/i.test(u.hostname)) return 'your YouTube pick';
+    const last = decodeURIComponent(u.pathname.split('/').pop() || '');
+    return last || 'your video';
+  } catch { return 'your video'; }
+}
+function setPickName(n) {
+  document.getElementById('pickname').textContent = n;
+}
+
+// Reciprocity: direct video links preview INSIDE the monitor immediately —
+// the product demos itself before asking for anything.
+const PREVIEW_RE = /\.(mp4|webm|m4v|mov)(\?|$)/i;
+const wallEl = document.querySelector('.wall');
+let wallvid = null, lastObjUrl = null;
+function ensureWallvid() {
+  if (wallvid) return wallvid;
+  wallvid = document.createElement('video');
+  wallvid.className = 'wallvid';
+  wallvid.muted = true; wallvid.loop = true; wallvid.autoplay = true;
+  wallvid.setAttribute('playsinline', '');
+  wallEl.insertBefore(wallvid, wallEl.querySelector('.shade'));
+  return wallvid;
+}
+function startPreview(src) {
+  const v = ensureWallvid();
+  v.src = src;
+  v.play().catch(() => {});
+  document.getElementById('pvpill').classList.add('on');
+}
+function previewInMonitor(url) {
+  if (!PREVIEW_RE.test(url)) return; // site links (YouTube etc.) can't stream into <video>
+  if (lastObjUrl) { URL.revokeObjectURL(lastObjUrl); lastObjUrl = null; }
+  startPreview(url);
+}
+function previewLocalFile(file) {
+  if (lastObjUrl) URL.revokeObjectURL(lastObjUrl);
+  lastObjUrl = URL.createObjectURL(file);
+  startPreview(lastObjUrl);
+}
+
 // ---- local file → wallpaper (dropped right here on the page) ----
 // The page sends the dropped file's bytes to the app's loopback server.
 // Some browsers gate page→localhost behind a one-time "allow local network"
@@ -766,6 +852,8 @@ async function handleLocalFile(file) {
     err.textContent = "That's not a video file — try .mp4, .webm, .mkv or .mov.";
     return;
   }
+  setPickName(file.name);
+  previewLocalFile(file);
   setPcbox('Sending to Driftpaper…');
 
   // 1) straight to the app — works if it's running and the browser allows it.
