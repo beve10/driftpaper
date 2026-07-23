@@ -154,10 +154,31 @@
   .hud > * { pointer-events: auto; }
   .brand {
     display: flex; align-items: center; gap: .6rem;
+    position: relative;
   }
   .brand img {
     width: clamp(30px, 3.6vw, 40px); height: auto; border-radius: 8px;
     box-shadow: 0 5px 16px rgba(0,0,0,.45);
+    animation: logoglow 3.2s ease-in-out infinite;
+  }
+  /* gamified badge glow: breathing amber aura + a ping ring every cycle */
+  @keyframes logoglow {
+    0%, 100% { box-shadow: 0 5px 16px rgba(0,0,0,.45), 0 0 10px rgba(243,181,115,.25); }
+    50% { box-shadow: 0 5px 16px rgba(0,0,0,.45), 0 0 22px rgba(243,181,115,.6); }
+  }
+  .brand::before {
+    content: ""; position: absolute;
+    left: 0; top: 50%;
+    width: clamp(30px, 3.6vw, 40px); aspect-ratio: 1;
+    margin-top: calc(clamp(30px, 3.6vw, 40px) / -2);
+    border-radius: 10px;
+    border: 2px solid var(--amber2);
+    opacity: 0; pointer-events: none;
+    animation: logoping 3.2s ease-out infinite;
+  }
+  @keyframes logoping {
+    0% { opacity: .7; transform: scale(1); }
+    45%, 100% { opacity: 0; transform: scale(1.55); }
   }
   .brand .name {
     font-size: clamp(1.5rem, 3.2vw, 2.2rem); font-weight: 800; letter-spacing: -.01em;
@@ -172,6 +193,16 @@
   .big em {
     font-style: italic; font-family: Georgia, serif; font-weight: 400;
     color: var(--amber2);
+  }
+  /* smooth wave: each letter bobs in sequence; the crest catches the light */
+  .big em .wch {
+    display: inline-block;
+    animation: wavec 2.6s ease-in-out infinite;
+    animation-delay: calc(var(--i) * .07s);
+  }
+  @keyframes wavec {
+    0%, 100% { transform: translateY(0); color: var(--amber2); text-shadow: 0 2px 14px rgba(0,0,0,.45); }
+    50% { transform: translateY(-4px); color: #ffdcab; text-shadow: 0 0 16px rgba(255,214,160,.45); }
   }
   .palette {
     display: flex; width: min(620px, 100%);
@@ -596,9 +627,12 @@
   @media (prefers-reduced-motion: reduce) {
     /* Background effects stop; the explainer must keep working — it IS the
        content. It cycles at half speed instead of freezing. */
-    .sun, .streak, .di:first-child .bx, .dz-inner .arrow { animation: none !important; }
+    .sun, .streak, .di:first-child .bx, .dz-inner .arrow, .brand::before { animation: none !important; }
     .wallfill, .bar, .setb, .tplay, .ringz circle, .chip, .ripple, .pcur,
     .ic, .cap { animation-duration: 24s !important; }
+    /* the wave is brand content: slow to a lull instead of freezing */
+    .big em .wch { animation-duration: 7s !important; }
+    .brand img { animation: none !important; box-shadow: 0 5px 16px rgba(0,0,0,.45), 0 0 14px rgba(243,181,115,.4) !important; }
   }
 </style>
 </head>
@@ -722,6 +756,24 @@
 </main>
 
 <script>
+// split the hero phrase into letters so each can ride the wave
+// (spaces stay as text nodes so the line still wraps on small screens)
+(() => {
+  const em = document.querySelector('.big em');
+  if (!em) return;
+  const text = em.textContent;
+  em.textContent = '';
+  let i = 0;
+  for (const ch of text) {
+    if (ch === ' ') { em.appendChild(document.createTextNode(' ')); continue; }
+    const s = document.createElement('span');
+    s.className = 'wch';
+    s.style.setProperty('--i', i++);
+    s.textContent = ch;
+    em.appendChild(s);
+  }
+})();
+
 const link = document.getElementById('link');
 const err = document.getElementById('err');
 const note = document.getElementById('note');
